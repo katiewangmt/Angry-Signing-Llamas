@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASL Sign Language Detector — Hackathon Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: #1e1e2e;
+    --accent: #00ff88;
+    --accent2: #00d4ff;
+    --accent3: #ff6b9d;
+    --text: #e0e0e8;
+    --muted: #6b6b80;
+    --glow: rgba(0, 255, 136, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+    z-index: 0;
+  }
+
+  @keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(60px, 60px); }
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 4rem 0 3rem;
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(0,255,136,0.1);
+    border: 1px solid rgba(0,255,136,0.3);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.4rem 1.2rem;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: 1.2rem;
+    color: var(--muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Pipeline section */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 3rem 0;
+    flex-wrap: wrap;
+  }
+
+  .pipe-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+    animation: fadeUp 0.6s ease-out both;
+  }
+
+  .pipe-node:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 30px var(--glow);
+    transform: translateY(-3px);
+  }
+
+  .pipe-node:nth-child(1) { animation-delay: 0.1s; }
+  .pipe-node:nth-child(3) { animation-delay: 0.2s; }
+  .pipe-node:nth-child(5) { animation-delay: 0.3s; }
+  .pipe-node:nth-child(7) { animation-delay: 0.4s; }
+  .pipe-node:nth-child(9) { animation-delay: 0.5s; }
+
+  .pipe-icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+  .pipe-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .pipe-value {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-top: 0.15rem;
+  }
+
+  .pipe-arrow {
+    color: var(--accent);
+    font-size: 1.5rem;
+    font-family: 'Space Mono', monospace;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Tech stack cards */
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.8rem;
+    transition: all 0.3s ease;
+    animation: fadeUp 0.6s ease-out both;
+  }
+
+  .card:nth-child(1) { animation-delay: 0.1s; }
+  .card:nth-child(2) { animation-delay: 0.2s; }
+  .card:nth-child(3) { animation-delay: 0.3s; }
+
+  .card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 40px var(--glow);
+    transform: translateY(-4px);
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-icon.tf { background: rgba(255, 153, 0, 0.15); }
+  .card-icon.mp { background: rgba(0, 212, 255, 0.15); }
+  .card-icon.cv { background: rgba(255, 107, 157, 0.15); }
+
+  .card h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  /* Code block */
+  .code-section {
+    margin-bottom: 3rem;
+  }
+
+  .code-block {
+    background: #0d0d15;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.2rem;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .code-dot.red { background: #ff5f57; }
+  .code-dot.yellow { background: #febc2e; }
+  .code-dot.green { background: #28c840; }
+
+  .code-header span {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .code-body {
+    padding: 1.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+
+  .code-body .comment { color: #4a4a5e; }
+  .code-body .keyword { color: var(--accent3); }
+  .code-body .string { color: var(--accent); }
+  .code-body .func { color: var(--accent2); }
+  .code-body .num { color: #ffd700; }
+
+  /* Hand landmarks visualization */
+  .landmarks-section {
+    text-align: center;
+    margin: 3rem 0;
+  }
+
+  .hand-svg {
+    max-width: 350px;
+    margin: 1.5rem auto;
+    filter: drop-shadow(0 0 20px rgba(0,255,136,0.2));
+  }
+
+  /* Stats row */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 2rem 0 3rem;
+  }
+
+  .stat {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .stat-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 0.3rem;
+  }
+
+  /* ASL alphabet grid */
+  .alphabet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+    gap: 8px;
+    margin: 1.5rem 0 3rem;
+  }
+
+  .letter-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+    cursor: default;
+  }
+
+  .letter-cell:hover {
+    background: rgba(0,255,136,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: scale(1.1);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 2rem 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .pipeline { flex-direction: column; }
+    .pipe-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">🤟 Hackathon Project</div>
+    <h1>ASL Sign<br>Language Detector</h1>
+    <p>Real-time American Sign Language recognition powered by MediaPipe hand tracking and TensorFlow deep learning</p>
+  </div>
+
+  <!-- Pipeline -->
+  <div class="pipeline">
+    <div class="pipe-node">
+      <div class="pipe-icon">📷</div>
+      <div class="pipe-label">Input</div>
+      <div class="pipe-value">Webcam</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node">
+      <div class="pipe-icon">🖼️</div>
+      <div class="pipe-label">Processing</div>
+      <div class="pipe-value">OpenCV</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node">
+      <div class="pipe-icon">✋</div>
+      <div class="pipe-label">Detection</div>
+      <div class="pipe-value">MediaPipe</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node">
+      <div class="pipe-icon">🧠</div>
+      <div class="pipe-label">Classification</div>
+      <div class="pipe-value">TensorFlow</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node">
+      <div class="pipe-icon">🔤</div>
+      <div class="pipe-label">Output</div>
+      <div class="pipe-value">ASL Letter</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value">21</div>
+      <div class="stat-label">Hand Landmarks</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">63</div>
+      <div class="stat-label">Input Features</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">26</div>
+      <div class="stat-label">ASL Letters</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">30+</div>
+      <div class="stat-label">FPS Real-Time</div>
+    </div>
+  </div>
+
+  <!-- Tech Stack -->
+  <div class="section-title">Tech Stack</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon tf">🔶</div>
+      <h3>TensorFlow</h3>
+      <p>Dense neural network with batch normalization, dropout, and L2 regularization. Classifies 63 landmark features into 26 ASL letters with high accuracy.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon mp">🔵</div>
+      <h3>MediaPipe Hands</h3>
+      <p>Google's ML pipeline extracts 21 3D hand landmarks per frame. Position and scale normalized for translation/rotation invariance.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon cv">🔴</div>
+      <h3>OpenCV</h3>
+      <p>Real-time webcam capture, frame processing, and UI overlay. Handles video I/O and rendering at 30+ FPS for smooth detection.</p>
+    </div>
+  </div>
+
+  <!-- Quick Start Code -->
+  <div class="code-section">
+    <div class="section-title">Quick Start</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dot red"></div>
+        <div class="code-dot yellow"></div>
+        <div class="code-dot green"></div>
+        <span>terminal</span>
+      </div>
+      <div class="code-body">
+<span class="comment"># 1. Install dependencies</span>
+pip install tensorflow mediapipe opencv-python numpy scikit-learn
+
+<span class="comment"># 2. Collect training data (press letter keys + SPACE to capture)</span>
+python collect_data.py
+
+<span class="comment"># 3. Train the model</span>
+python train_model.py
+
+<span class="comment"># 4. Run real-time detection!</span>
+python detect.py
+      </div>
+    </div>
+  </div>
+
+  <!-- Model Architecture -->
+  <div class="code-section">
+    <div class="section-title">Model Architecture</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dot red"></div>
+        <div class="code-dot yellow"></div>
+        <div class="code-dot green"></div>
+        <span>model.py</span>
+      </div>
+      <div class="code-body">
+<span class="keyword">Input</span>(<span class="num">63</span>)  <span class="comment"># 21 landmarks × 3 coordinates (x, y, z)</span>
+  → <span class="func">Dense</span>(<span class="num">256</span>) → <span class="func">BatchNorm</span> → <span class="func">ReLU</span> → <span class="func">Dropout</span>(<span class="num">0.4</span>)
+  → <span class="func">Dense</span>(<span class="num">128</span>) → <span class="func">BatchNorm</span> → <span class="func">ReLU</span> → <span class="func">Dropout</span>(<span class="num">0.4</span>)
+  → <span class="func">Dense</span>(<span class="num">64</span>)  → <span class="func">BatchNorm</span> → <span class="func">ReLU</span> → <span class="func">Dropout</span>(<span class="num">0.2</span>)
+  → <span class="func">Dense</span>(<span class="num">26</span>, <span class="keyword">softmax</span>)  <span class="comment"># A-Z output</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASL Alphabet -->
+  <div class="section-title">Supported ASL Alphabet</div>
+  <div class="alphabet-grid" id="alphabet"></div>
+
+  <div class="footer">
+    Built with TensorFlow + MediaPipe + OpenCV &nbsp;·&nbsp; <a href="#">GitHub Repo</a>
+  </div>
+
+</div>
+
+<script>
+  // Generate alphabet grid
+  const grid = document.getElementById('alphabet');
+  for (let i = 65; i <= 90; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'letter-cell';
+    cell.textContent = String.fromCharCode(i);
+    cell.style.animationDelay = `${(i - 65) * 0.03}s`;
+    grid.appendChild(cell);
+  }
+</script>
+</body>
+</html>

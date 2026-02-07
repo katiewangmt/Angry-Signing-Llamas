@@ -18,7 +18,7 @@ class SimpleASLAccumulator:
         self.words.append(word)
         sentence = " ".join(self.words)
         
-        print(f"\n📝 Added: '{word}'")
+        print(f"\r\n📝 Added: '{word}'")
         print(f"💬 Current sentence: {sentence}")
         print(f"📊 Word count: {len(self.words)}/{self.auto_speak_after}")
         
@@ -33,7 +33,7 @@ class SimpleASLAccumulator:
             return
         
         text = " ".join(self.words)
-        print(f"\n🎤 Generating speech: '{text}'")
+        print(f"\r\n🎤 Generating speech: '{text}'")
         
         try:
             response = requests.post(
@@ -55,7 +55,7 @@ class SimpleASLAccumulator:
                 
                 # Clear words after speaking
                 self.words = []
-                print("🗑️ Buffer cleared\n")
+                print("🗑️ Buffer cleared\r\n")
             else:
                 print(f"❌ Error: {response.status_code}")
         except Exception as e:
@@ -89,12 +89,12 @@ def example_usage():
     print("=" * 60)
     print("  Simple ASL Word Accumulator")
     print("=" * 60)
-    print("\nType words one at a time (or space-separated)")
+    print("\r\nType words one at a time (or space-separated)")
     print("Commands:")
     print("  'speak' - Generate speech now")
     print("  'clear' - Clear buffer")
     print("  'quit'  - Exit")
-    print(f"\nAuto-generates instantly for each word\n")
+    print(f"\r\nAuto-generates instantly for each word\r\n")
     
     while True:
         user_input = input("Word(s): ").strip()
@@ -119,11 +119,11 @@ if __name__ == "__main__":
     # Check if server is running
     try:
         response = requests.get("http://localhost:8000", timeout=2)
-        print("✅ Server is running\n")
+        print("✅ Server is running\r\n")
     except:
         print("❌ ERROR: Server not running!")
         print("Please start the server first:")
-        print("  python debug_server.py\n")
+        print("  python debug_server.py\r\n")
         sys.exit(1)
     
     example_usage()

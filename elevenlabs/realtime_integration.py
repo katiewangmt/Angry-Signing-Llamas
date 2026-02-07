@@ -69,7 +69,7 @@ class RealtimeASLToSpeech:
             return False
         
         self.is_generating = True
-        print(f"\n🎤 Generating speech for: '{text_to_speak}'")
+        print(f"\r\n🎤 Generating speech for: '{text_to_speak}'")
         
         try:
             response = requests.post(
@@ -171,7 +171,7 @@ def example_realtime_with_webcam():
     print("=" * 70)
     print("  🎤 Real-time ASL to Rap Speech")
     print("=" * 70)
-    print("\n⚙️  Initializing...")
+    print("\r\n⚙️  Initializing...")
     
     # Initialize ASL to Speech
     asl_speech = RealtimeASLToSpeech()
@@ -187,13 +187,13 @@ def example_realtime_with_webcam():
     # from ultralytics import YOLO
     # model = YOLO('path/to/your/asl_model.pt')
     
-    print("\n✅ System ready!")
-    print("\n📹 Controls:")
+    print("\r\n✅ System ready!")
+    print("\r\n📹 Controls:")
     print("   SPACE - Manually generate speech from current words")
     print("   C     - Clear word buffer")
     print("   Q     - Quit")
-    print("\n🎯 Auto-generation: Every 10 words\n")
-    print("=" * 70 + "\n")
+    print("\r\n🎯 Auto-generation: Every 10 words\r\n")
+    print("=" * 70 + "\r\n")
     
     frame_count = 0
     
@@ -273,7 +273,7 @@ def example_realtime_with_webcam():
     
     cap.release()
     cv2.destroyAllWindows()
-    print("\n✅ Session ended")
+    print("\r\n✅ Session ended")
 
 
 def example_text_stream():
@@ -285,8 +285,8 @@ def example_text_stream():
     print("=" * 70)
     print("  🎤 Text Stream to Rap Speech")
     print("=" * 70)
-    print("\nType words and press ENTER. Speech auto-generates every 10 words.")
-    print("Commands: 'generate' = force generation, 'clear' = clear buffer, 'quit' = exit\n")
+    print("\r\nType words and press ENTER. Speech auto-generates every 10 words.")
+    print("Commands: 'generate' = force generation, 'clear' = clear buffer, 'quit' = exit\r\n")
     
     asl_speech = RealtimeASLToSpeech()
     
@@ -324,7 +324,7 @@ def example_yolo_integration():
     cap = cv2.VideoCapture(0)
     
     print("🎤 Real-time ASL to Speech - YOLO11 Integration")
-    print("Press Q to quit\n")
+    print("Press Q to quit\r\n")
     
     while True:
         ret, frame = cap.read()
@@ -369,20 +369,20 @@ def example_yolo_integration():
 
 
 if __name__ == "__main__":
-    print("\n🎤 ASL to Rap Speech - Real-time Integration\n")
+    print("\r\n🎤 ASL to Rap Speech - Real-time Integration\r\n")
     print("Choose an example:")
     print("1. Webcam with simulated recognition (DEMO)")
     print("2. Text stream input (TESTING)")
     print("3. Show YOLO11 integration template (CODE)")
     
-    choice = input("\nEnter choice (1-3): ").strip()
+    choice = input("\r\nEnter choice (1-3): ").strip()
     
     if choice == "1":
         example_realtime_with_webcam()
     elif choice == "2":
         example_text_stream()
     elif choice == "3":
-        print("\n" + "=" * 70)
+        print("\r\n" + "=" * 70)
         print("YOLO11 Integration Template:")
         print("=" * 70)
         print("""

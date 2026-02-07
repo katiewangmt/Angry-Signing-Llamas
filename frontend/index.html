@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SignCraft</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    [data-theme="dark"] {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --bg-card: #1f2b47;
+      --accent: #4ade80;
+      --accent-dim: rgba(74, 222, 128, 0.12);
+      --accent-glow: rgba(74, 222, 128, 0.35);
+      --text-primary: #e2e8f0;
+      --text-secondary: #7a8baa;
+      --border: #2d3f5e;
+      --danger: #ff4466;
+      --toggle-bg: #2d3f5e;
+      --toggle-knob: #e2e8f0;
+      --shadow: rgba(0, 0, 0, 0.4);
+      --webcam-bg: #0f172a;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f5f1e8;
+      --bg-secondary: #ebe7dc;
+      --bg-card: #ffffff;
+      --accent: #4a7a64;
+      --accent-dim: rgba(74, 122, 100, 0.1);
+      --accent-glow: rgba(74, 122, 100, 0.2);
+      --text-primary: #1a1a1a;
+      --text-secondary: #4a4a4a;
+      --border: #c4bfb2;
+      --danger: #dc2626;
+      --toggle-bg: #c4bfb2;
+      --toggle-knob: #1a1a1a;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --webcam-bg: #ddd8cb;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { transition: background 0.4s ease, color 0.4s ease; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 31px, var(--border) 31px, var(--border) 32px),
+        repeating-linear-gradient(90deg, transparent, transparent 31px, var(--border) 31px, var(--border) 32px);
+      opacity: 0.06;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ============================================================
+       LAYOUT
+       ============================================================ */
+    .app {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 32px;
+      gap: 20px;
+    }
+
+    /* === HEADER === */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 18px;
+      border-bottom: 3px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .header-side {
+      flex-shrink: 0;
+    }
+
+    .logo {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 28px;
+      color: var(--text-primary);
+      transition: color 0.6s;
+    }
+
+    .logo span {
+      color: var(--accent);
+      text-shadow: 3px 3px 0px var(--accent-dim);
+      transition: color 0.6s, text-shadow 0.6s;
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-track {
+      width: 58px;
+      height: 32px;
+      background: var(--toggle-bg);
+      border-radius: 16px;
+      position: relative;
+      transition: background 0.3s;
+      border: 2px solid var(--border);
+    }
+
+    .toggle-knob {
+      width: 24px;
+      height: 24px;
+      background: var(--toggle-knob);
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s ease, background 0.3s;
+    }
+
+    [data-theme="light"] .toggle-knob { transform: translateX(26px); }
+    .toggle-icon { font-size: 18px; }
+
+    /* === MAIN SPLIT === */
+    .main {
+      flex: 1;
+      display: flex;
+      gap: 28px;
+      min-height: 0;
+    }
+
+    /* LEFT: WEBCAM */
+    .left-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .section-label {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-secondary);
+      transition: color 0.4s;
+      flex-shrink: 0;
+    }
+
+    .webcam-container {
+      position: relative;
+      flex: 1;
+      background: var(--webcam-bg);
+      border: 3px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 6px 6px 0px var(--shadow);
+      transition: background 0.4s, border-color 0.6s, box-shadow 0.4s;
+      min-height: 0;
+    }
+
+    .webcam-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    .webcam-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      color: var(--text-secondary);
+    }
+
+    .webcam-placeholder svg { opacity: 0.3; }
+
+    .webcam-placeholder p {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .webcam-overlay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .overlay-tag {
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid var(--accent);
+      border-radius: 2px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      transition: border-color 0.6s, color 0.6s;
+    }
+
+    .corner-deco {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-color: var(--accent);
+      border-style: solid;
+      opacity: 0.6;
+      transition: border-color 0.6s;
+    }
+    .corner-deco.tl { top: 6px; left: 6px; border-width: 3px 0 0 3px; }
+    .corner-deco.tr { top: 6px; right: 6px; border-width: 3px 3px 0 0; }
+    .corner-deco.bl { bottom: 6px; left: 6px; border-width: 0 0 3px 3px; }
+    .corner-deco.br { bottom: 6px; right: 6px; border-width: 0 3px 3px 0; }
+
+    .cam-btn {
+      padding: 12px 22px;
+      background: var(--accent);
+      color: var(--bg-primary);
+      border: 3px solid transparent;
+      border-radius: 2px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s, background 0.6s;
+      box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+    }
+
+    .cam-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px rgba(0,0,0,0.3);
+    }
+
+    .cam-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+    }
+
+    .cam-btn.active {
+      background: var(--danger);
+      color: white;
+    }
+
+    /* RIGHT: CONTROLS */
+    .right-panel {
+      width: 360px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    /* scrollbar styling */
+    .right-panel::-webkit-scrollbar { width: 4px; }
+    .right-panel::-webkit-scrollbar-track { background: transparent; }
+    .right-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* === DETECTED SIGNS === */
+    .detection-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 34px;
+    }
+
+    .detected-output {
+      display: flex;
+      align-items: center;
+      padding: 20px 24px;
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      border-radius: 4px;
+      min-height: 64px;
+      box-shadow: 4px 4px 0px var(--shadow);
+      transition: background 0.4s, border-color 0.6s, box-shadow 0.4s;
+    }
+
+    .detected-text {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 24px;
+      color: var(--text-primary);
+      letter-spacing: 4px;
+      flex: 1;
+      min-height: 24px;
+      word-break: break-all;
+      transition: color 0.4s;
+    }
+
+    .detected-text .cursor {
+      display: inline-block;
+      width: 14px;
+      height: 24px;
+      background: var(--accent);
+      vertical-align: middle;
+      animation: blink 0.8s step-end infinite;
+      transition: background 0.6s;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* === BEAT GENERATOR === */
+    .beat-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 24px;
+      margin-bottom: 34px;
+      border-top: 3px solid var(--border);
+      transition: border-color 0.6s;
+    }
+
+    .beat-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .beat-input {
+      flex: 1;
+      padding: 14px 16px;
+      background: var(--bg-secondary);
+      border: 3px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s, background 0.4s, color 0.4s;
+    }
+
+    .beat-input::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.5;
+      font-size: 12px;
+    }
+
+    .beat-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .generate-btn {
+      padding: 14px 20px;
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      box-shadow: 3px 3px 0px var(--shadow);
+    }
+
+    .generate-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px var(--shadow);
+    }
+
+    .generate-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--shadow);
+    }
+
+    /* === CURRENT BEAT PLAYER === */
+    .beat-player {
+      display: none;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      border-radius: 4px;
+      box-shadow: 4px 4px 0px var(--shadow);
+      transition: background 0.4s, border-color 0.6s, box-shadow 0.4s;
+    }
+
+    .beat-player.visible { display: flex; }
+
+    .play-stop-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      border: 3px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s, background 0.6s;
+      flex-shrink: 0;
+      box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+    }
+
+    .play-stop-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+    }
+
+    .play-stop-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 0px 0px 0px rgba(0,0,0,0.3);
+    }
+
+    .play-stop-btn svg {
+      fill: var(--bg-primary);
+      width: 16px;
+      height: 16px;
+    }
+
+    .beat-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .beat-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      color: var(--text-primary);
+      transition: color 0.4s;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .beat-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: color 0.4s;
+    }
+
+    .vibe-tag {
+      padding: 5px 10px;
+      border-radius: 2px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      white-space: nowrap;
+      transition: all 0.6s;
+      flex-shrink: 0;
+    }
+
+    .visualizer {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .viz-bar {
+      width: 3px;
+      background: var(--accent);
+      opacity: 0.35;
+      transition: height 0.1s, background 0.6s;
+    }
+
+    .visualizer.active .viz-bar {
+      animation: viz-bounce 0.5s steps(4) infinite alternate;
+      opacity: 0.85;
+    }
+
+    @keyframes viz-bounce {
+      0% { height: 4px; }
+      100% { height: 24px; }
+    }
+
+    .viz-bar:nth-child(1) { animation-delay: 0.00s; }
+    .viz-bar:nth-child(2) { animation-delay: 0.08s; }
+    .viz-bar:nth-child(3) { animation-delay: 0.16s; }
+    .viz-bar:nth-child(4) { animation-delay: 0.04s; }
+    .viz-bar:nth-child(5) { animation-delay: 0.12s; }
+    .viz-bar:nth-child(6) { animation-delay: 0.20s; }
+    .viz-bar:nth-child(7) { animation-delay: 0.06s; }
+    .viz-bar:nth-child(8) { animation-delay: 0.14s; }
+
+    /* === RECENT BEATS === */
+    .recent-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 24px;
+      border-top: 3px solid var(--border);
+      transition: border-color 0.6s;
+    }
+
+    .recent-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .recent-beat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 2px 2px 0px var(--shadow);
+    }
+
+    .recent-beat:hover {
+      border-color: var(--accent);
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px var(--shadow);
+    }
+
+    .recent-beat:active {
+      transform: translate(1px, 1px);
+      box-shadow: 0px 0px 0px var(--shadow);
+    }
+
+    .recent-beat-number {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      color: var(--accent);
+      flex-shrink: 0;
+      width: 22px;
+      transition: color 0.6s;
+    }
+
+    .recent-beat-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .recent-beat-name {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 9px;
+      color: var(--text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: color 0.4s;
+    }
+
+    .recent-beat-vibe {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+      transition: color 0.4s;
+    }
+
+    .recent-beat-play {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+      border-radius: 4px;
+      flex-shrink: 0;
+      transition: all 0.6s;
+    }
+
+    .recent-beat-play svg {
+      fill: var(--accent);
+      width: 10px;
+      height: 10px;
+      transition: fill 0.6s;
+    }
+
+    .no-recent {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 9px;
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 16px;
+      opacity: 0.5;
+    }
+
+    /* === FOOTER === */
+    .footer {
+      text-align: left;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 8px;
+      color: var(--text-secondary);
+      opacity: 0.4;
+      letter-spacing: 1px;
+      transition: color 0.4s;
+      flex-shrink: 0;
+      padding-top: 8px;
+    }
+
+    /* === ANIMATIONS === */
+    .fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+    .fade-in:nth-child(1) { animation-delay: 0.05s; }
+    .fade-in:nth-child(2) { animation-delay: 0.15s; }
+    .fade-in:nth-child(3) { animation-delay: 0.25s; }
+
+    @keyframes color-pulse {
+      0% { opacity: 0.7; transform: scale(0.98); }
+      50% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0.7; transform: scale(0.98); }
+    }
+
+    .color-shifting .logo span {
+      animation: color-pulse 0.6s ease-out;
+    }
+
+    /* === RESPONSIVE: stack on small screens === */
+    @media (max-width: 800px) {
+      .app {
+        height: auto;
+        min-height: 100vh;
+      }
+      .main {
+        flex-direction: column;
+      }
+      .right-panel {
+        width: 100%;
+      }
+      .webcam-container {
+        aspect-ratio: 16 / 9;
+        flex: none;
+      }
+      .logo { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- HEADER -->
+    <header class="header fade-in">
+      <div class="logo">Sign<span>Craft</span></div>
+      <div class="header-side">
+        <div class="theme-toggle" onclick="toggleTheme()">
+          <span class="toggle-icon">🌙</span>
+          <div class="toggle-track"><div class="toggle-knob"></div></div>
+          <span class="toggle-icon">☀️</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN SPLIT -->
+    <div class="main fade-in">
+
+      <!-- LEFT: WEBCAM -->
+      <div class="left-panel">
+        <div class="section-label">Live Feed</div>
+        <div class="webcam-container" id="webcamContainer">
+          <div class="webcam-placeholder" id="webcamPlaceholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+            <p>Press start camera<br>to begin signing</p>
+            <button class="cam-btn" id="camBtn" onclick="toggleCamera()">Start Camera</button>
+          </div>
+          <video id="webcamVideo" autoplay playsinline style="display:none;"></video>
+          <div class="webcam-overlay" id="webcamOverlay" style="display:none;">
+            <div class="overlay-tag">ASL Detect</div>
+            <div class="overlay-tag" id="fpsTag">-- fps</div>
+          </div>
+          <div class="corner-deco tl" style="display:none;"></div>
+          <div class="corner-deco tr" style="display:none;"></div>
+          <div class="corner-deco bl" style="display:none;"></div>
+          <div class="corner-deco br" style="display:none;"></div>
+          <button class="cam-btn active" id="camStopBtn" onclick="toggleCamera()" style="display:none;position:absolute;bottom:10px;right:10px;">Stop Camera</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: CONTROLS -->
+      <div class="right-panel">
+
+        <!-- DETECTED SIGNS -->
+        <section class="detection-section">
+          <div class="section-label">Detected Signs</div>
+          <div class="detected-output">
+            <div class="detected-text" id="detectedText"><span class="cursor"></span></div>
+          </div>
+        </section>
+
+        <!-- BEAT GENERATOR -->
+        <section class="beat-section">
+          <div class="section-label">Beat Generator</div>
+          <div class="beat-input-row">
+            <input type="text" class="beat-input" id="beatInput" placeholder="Describe a beat..."/>
+            <button class="generate-btn" id="generateBtn" onclick="generateBeat()">Generate</button>
+          </div>
+          <div class="beat-player" id="beatPlayer">
+            <button class="play-stop-btn" id="playStopBtn" onclick="toggleBeat()">
+              <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+              <svg id="stopIcon" viewBox="0 0 24 24" style="display:none;"><rect x="4" y="4" width="16" height="16"/></svg>
+            </button>
+            <div class="beat-info">
+              <div class="beat-title" id="beatTitle">Generated beat</div>
+              <div class="beat-subtitle" id="beatSubtitle">Ready to play</div>
+            </div>
+            <div class="vibe-tag" id="vibeTag" style="display:none;">chill</div>
+            <div class="visualizer" id="visualizer">
+              <div class="viz-bar" style="height:8px;"></div>
+              <div class="viz-bar" style="height:14px;"></div>
+              <div class="viz-bar" style="height:6px;"></div>
+              <div class="viz-bar" style="height:20px;"></div>
+              <div class="viz-bar" style="height:10px;"></div>
+              <div class="viz-bar" style="height:16px;"></div>
+              <div class="viz-bar" style="height:8px;"></div>
+              <div class="viz-bar" style="height:12px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RECENT BEATS -->
+        <section class="recent-section">
+          <div class="section-label">Recent Beats</div>
+          <div class="recent-list" id="recentList">
+            <div class="no-recent" id="noRecent">No beats yet — generate one!</div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <div class="footer fade-in">SignCraft v1.0 — built at ADI 2026</div>
+  </div>
+
+  <script>
+    // ============================================================
+    // STATE
+    // ============================================================
+    let cameraOn = false;
+    let stream = null;
+    let beatPlaying = false;
+    let detectedLetters = '';
+    let recentBeats = []; // max 3
+    let currentVibe = null;
+
+    // ============================================================
+    // VIBE COLOR MAP
+    // ============================================================
+    const VIBE_MAP = [
+      {
+        keywords: ['lofi', 'lo-fi', 'chill', 'ambient', 'calm', 'mellow', 'dreamy', 'sleep', 'relax'],
+        dark:  { accent: '#c4b5fd', dim: 'rgba(196,181,253,0.12)', glow: 'rgba(196,181,253,0.35)' },
+        light: { accent: '#6b5aad', dim: 'rgba(107,90,173,0.12)', glow: 'rgba(107,90,173,0.25)' },
+        label: 'chill'
+      },
+      {
+        keywords: ['trap', 'hard', 'drill', 'aggressive', 'dark', 'heavy', 'grime', 'bass', 'phonk'],
+        dark:  { accent: '#f87171', dim: 'rgba(248,113,113,0.12)', glow: 'rgba(248,113,113,0.35)' },
+        light: { accent: '#b03a3a', dim: 'rgba(176,58,58,0.12)', glow: 'rgba(176,58,58,0.25)' },
+        label: 'hard'
+      },
+      {
+        keywords: ['funk', 'groovy', 'disco', 'party', 'dance', 'upbeat', 'bounce', 'house'],
+        dark:  { accent: '#fde68a', dim: 'rgba(253,230,138,0.12)', glow: 'rgba(253,230,138,0.35)' },
+        light: { accent: '#a08520', dim: 'rgba(160,133,32,0.12)', glow: 'rgba(160,133,32,0.25)' },
+        label: 'groovy'
+      },
+      {
+        keywords: ['jazz', 'soul', 'blues', 'smooth', 'saxophone', 'piano', 'swing', 'bossa'],
+        dark:  { accent: '#fdba74', dim: 'rgba(253,186,116,0.12)', glow: 'rgba(253,186,116,0.35)' },
+        light: { accent: '#956530', dim: 'rgba(149,101,48,0.12)', glow: 'rgba(149,101,48,0.25)' },
+        label: 'smooth'
+      },
+      {
+        keywords: ['edm', 'electronic', 'techno', 'synth', 'rave', 'trance', 'dubstep', 'cyber', 'neon'],
+        dark:  { accent: '#67e8f9', dim: 'rgba(103,232,249,0.12)', glow: 'rgba(103,232,249,0.35)' },
+        light: { accent: '#1a7a8a', dim: 'rgba(26,122,138,0.12)', glow: 'rgba(26,122,138,0.25)' },
+        label: 'electric'
+      },
+      {
+        keywords: ['rock', 'punk', 'metal', 'guitar', 'grunge', 'alt', 'indie'],
+        dark:  { accent: '#fdac74', dim: 'rgba(253,172,116,0.12)', glow: 'rgba(253,172,116,0.35)' },
+        light: { accent: '#a06030', dim: 'rgba(160,96,48,0.12)', glow: 'rgba(160,96,48,0.25)' },
+        label: 'raw'
+      },
+      {
+        keywords: ['classical', 'orchestra', 'strings', 'violin', 'symphony', 'opera', 'epic', 'cinematic'],
+        dark:  { accent: '#ddd6fe', dim: 'rgba(221,214,254,0.12)', glow: 'rgba(221,214,254,0.35)' },
+        light: { accent: '#6a5a90', dim: 'rgba(106,90,144,0.12)', glow: 'rgba(106,90,144,0.25)' },
+        label: 'epic'
+      },
+      {
+        keywords: ['hiphop', 'hip-hop', 'hip hop', 'rap', 'boom bap', 'freestyle', 'bars', 'flow'],
+        dark:  { accent: '#bef264', dim: 'rgba(190,242,100,0.12)', glow: 'rgba(190,242,100,0.35)' },
+        light: { accent: '#4a7520', dim: 'rgba(74,117,32,0.12)', glow: 'rgba(74,117,32,0.25)' },
+        label: 'flow'
+      },
+      {
+        keywords: ['r&b', 'rnb', 'love', 'sensual', 'romantic', 'slow', 'ballad', 'mood'],
+        dark:  { accent: '#f9a8d4', dim: 'rgba(249,168,212,0.12)', glow: 'rgba(249,168,212,0.35)' },
+        light: { accent: '#9a4570', dim: 'rgba(154,69,112,0.12)', glow: 'rgba(154,69,112,0.25)' },
+        label: 'mood'
+      },
+    ];
+
+    const DEFAULT_DARK  = { accent: '#4ade80', dim: 'rgba(74,222,128,0.12)', glow: 'rgba(74,222,128,0.35)' };
+    const DEFAULT_LIGHT = { accent: '#4a7a64', dim: 'rgba(74,122,100,0.1)', glow: 'rgba(74,122,100,0.2)' };
+
+    function detectVibe(text) {
+      const lower = text.toLowerCase();
+      for (const vibe of VIBE_MAP) {
+        for (const kw of vibe.keywords) {
+          if (lower.includes(kw)) return vibe;
+        }
+      }
+      return null;
+    }
+
+    function applyAccent(colors) {
+      const root = document.documentElement;
+      root.style.setProperty('--accent', colors.accent);
+      root.style.setProperty('--accent-dim', colors.dim);
+      root.style.setProperty('--accent-glow', colors.glow);
+      const app = document.getElementById('app');
+      app.classList.add('color-shifting');
+      setTimeout(() => app.classList.remove('color-shifting'), 700);
+    }
+
+    function setVibeColors(vibe) {
+      const theme = document.documentElement.getAttribute('data-theme');
+      if (vibe) {
+        applyAccent(theme === 'dark' ? vibe.dark : vibe.light);
+      } else {
+        applyAccent(theme === 'dark' ? DEFAULT_DARK : DEFAULT_LIGHT);
+      }
+    }
+
+    // ============================================================
+    // THEME
+    // ============================================================
+    function toggleTheme() {
+      const html = document.documentElement;
+      const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('signcraft-theme', newTheme);
+      setVibeColors(currentVibe);
+    }
+
+    (function() {
+      const saved = localStorage.getItem('signcraft-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+
+    // ============================================================
+    // CAMERA
+    // ============================================================
+    async function toggleCamera() {
+      const video = document.getElementById('webcamVideo');
+      const placeholder = document.getElementById('webcamPlaceholder');
+      const startBtn = document.getElementById('camBtn');
+      const stopBtn = document.getElementById('camStopBtn');
+      const overlay = document.getElementById('webcamOverlay');
+      const corners = document.querySelectorAll('.corner-deco');
+
+      if (!cameraOn) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }
+          });
+          video.srcObject = stream;
+          video.style.display = 'block';
+          placeholder.style.display = 'none';
+          stopBtn.style.display = 'block';
+          overlay.style.display = 'flex';
+          corners.forEach(c => c.style.display = 'block');
+          cameraOn = true;
+          startFpsCounter();
+        } catch (err) {
+          alert('Could not access camera. Please allow camera permissions.');
+          console.error(err);
+        }
+      } else {
+        stream.getTracks().forEach(t => t.stop());
+        video.srcObject = null;
+        video.style.display = 'none';
+        placeholder.style.display = 'flex';
+        stopBtn.style.display = 'none';
+        overlay.style.display = 'none';
+        corners.forEach(c => c.style.display = 'none');
+        cameraOn = false;
+      }
+    }
+
+    function startFpsCounter() {
+      const fpsTag = document.getElementById('fpsTag');
+      let lastTime = performance.now();
+      let frames = 0;
+      function tick() {
+        if (!cameraOn) { fpsTag.textContent = '-- fps'; return; }
+        frames++;
+        const now = performance.now();
+        if (now - lastTime >= 1000) {
+          fpsTag.textContent = frames + ' fps';
+          frames = 0;
+          lastTime = now;
+        }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // ============================================================
+    // DETECTED SIGNS — Backend hooks
+    // ============================================================
+    function addDetectedLetter(letter) {
+      detectedLetters += letter;
+      renderDetected();
+    }
+
+    function addDetectedWord(word) {
+      if (detectedLetters.length > 0) detectedLetters += ' ';
+      detectedLetters += word;
+      renderDetected();
+    }
+
+    function renderDetected() {
+      document.getElementById('detectedText').innerHTML =
+        detectedLetters + '<span class="cursor"></span>';
+    }
+
+    // ============================================================
+    // BEAT GENERATOR
+    // ============================================================
+    function generateBeat() {
+      const input = document.getElementById('beatInput').value.trim();
+      if (!input) return;
+
+      const btn = document.getElementById('generateBtn');
+      const player = document.getElementById('beatPlayer');
+      const title = document.getElementById('beatTitle');
+      const subtitle = document.getElementById('beatSubtitle');
+      const vibeTag = document.getElementById('vibeTag');
+
+      btn.textContent = 'Working...';
+      btn.style.pointerEvents = 'none';
+
+      const vibe = detectVibe(input);
+      currentVibe = vibe;
+      setVibeColors(vibe);
+
+      if (vibe) {
+        vibeTag.textContent = vibe.label;
+        vibeTag.style.display = 'block';
+      } else {
+        vibeTag.style.display = 'none';
+      }
+
+      // TODO: Replace with real backend call
+      setTimeout(() => {
+        btn.textContent = 'Generate';
+        btn.style.pointerEvents = 'auto';
+        player.classList.add('visible');
+        title.textContent = '"' + input + '"';
+        subtitle.textContent = 'Beat ready — press play';
+
+        // Add to recent beats
+        addRecentBeat(input, vibe);
+        document.getElementById('beatInput').value = '';
+      }, 1500);
+    }
+
+    function toggleBeat() {
+      const playIcon = document.getElementById('playIcon');
+      const stopIcon = document.getElementById('stopIcon');
+      const viz = document.getElementById('visualizer');
+      const subtitle = document.getElementById('beatSubtitle');
+
+      beatPlaying = !beatPlaying;
+
+      if (beatPlaying) {
+        playIcon.style.display = 'none';
+        stopIcon.style.display = 'block';
+        viz.classList.add('active');
+        subtitle.textContent = 'Playing...';
+      } else {
+        playIcon.style.display = 'block';
+        stopIcon.style.display = 'none';
+        viz.classList.remove('active');
+        subtitle.textContent = 'Paused';
+      }
+    }
+
+    // ============================================================
+    // RECENT BEATS
+    // ============================================================
+    function addRecentBeat(prompt, vibe) {
+      // Add to front, keep max 3
+      recentBeats.unshift({ prompt, vibe });
+      if (recentBeats.length > 3) recentBeats.pop();
+      renderRecentBeats();
+    }
+
+    function renderRecentBeats() {
+      const list = document.getElementById('recentList');
+      const noRecent = document.getElementById('noRecent');
+
+      if (recentBeats.length === 0) {
+        list.innerHTML = '<div class="no-recent">No beats yet — generate one!</div>';
+        return;
+      }
+
+      list.innerHTML = recentBeats.map((beat, i) => `
+        <div class="recent-beat" onclick="loadRecentBeat(${i})">
+          <div class="recent-beat-number">${i + 1}.</div>
+          <div class="recent-beat-info">
+            <div class="recent-beat-name">${beat.prompt}</div>
+            <div class="recent-beat-vibe">${beat.vibe ? beat.vibe.label : 'custom'}</div>
+          </div>
+          <div class="recent-beat-play">
+            <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadRecentBeat(index) {
+      const beat = recentBeats[index];
+      if (!beat) return;
+
+      const player = document.getElementById('beatPlayer');
+      const title = document.getElementById('beatTitle');
+      const subtitle = document.getElementById('beatSubtitle');
+      const vibeTag = document.getElementById('vibeTag');
+
+      // Apply that beat's vibe colors
+      currentVibe = beat.vibe;
+      setVibeColors(beat.vibe);
+
+      if (beat.vibe) {
+        vibeTag.textContent = beat.vibe.label;
+        vibeTag.style.display = 'block';
+      } else {
+        vibeTag.style.display = 'none';
+      }
+
+      player.classList.add('visible');
+      title.textContent = '"' + beat.prompt + '"';
+      subtitle.textContent = 'Beat ready — press play';
+
+      // Stop current playback if playing
+      if (beatPlaying) toggleBeat();
+    }
+  </script>
+</body>
+</html>

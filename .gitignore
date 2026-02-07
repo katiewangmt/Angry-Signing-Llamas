@@ -1,0 +1,10 @@
+# Build and cache
+backend-java/target/
+backend-java/.mvn/cache/
+*.class
+
+# Generated audio (keep folder via .gitkeep)
+backend-java/generated/*.wav
+
+# OS
+.DS_Store

@@ -8,3 +8,4 @@ backend-java/generated/*.wav
 
 # OS
 .DS_Store
+backend/target/

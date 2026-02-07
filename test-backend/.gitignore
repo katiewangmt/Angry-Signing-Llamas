@@ -1,0 +1,4 @@
+.env
+generated_beats/
+__pycache__/
+*.pyc

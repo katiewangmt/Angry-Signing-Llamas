@@ -963,7 +963,175 @@
     }
 
     // ============================================================
-    // BEAT GENERATOR
+    // STREAMING BEAT ENGINE (WebSocket + Web Audio API)
+    // ============================================================
+    const WS_URL = 'ws://localhost:8000/ws/beat';
+    let beatSocket = null;
+    let audioCtx = null;
+    let scriptNode = null;
+    let audioQueue = [];       // queue of Float32 sample arrays
+    let queueReadOffset = 0;   // offset into first chunk in queue
+    let currentPrompt = '';
+
+    function ensureAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+          sampleRate: 48000,
+        });
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function pcm16ToFloat32Stereo(pcmBytes) {
+      // PCM 16-bit LE stereo → two Float32 channels
+      const int16 = new Int16Array(
+        pcmBytes.buffer, pcmBytes.byteOffset, pcmBytes.byteLength / 2
+      );
+      const samples = int16.length / 2; // stereo
+      const left = new Float32Array(samples);
+      const right = new Float32Array(samples);
+      for (let i = 0; i < samples; i++) {
+        left[i] = int16[i * 2] / 32768;
+        right[i] = int16[i * 2 + 1] / 32768;
+      }
+      return { left, right };
+    }
+
+    function startAudioPlayback() {
+      ensureAudioContext();
+
+      // ScriptProcessorNode pulls from our queue
+      if (scriptNode) {
+        scriptNode.disconnect();
+      }
+
+      const bufferSize = 4096;
+      scriptNode = audioCtx.createScriptProcessor(bufferSize, 0, 2);
+
+      scriptNode.onaudioprocess = (e) => {
+        const outL = e.outputBuffer.getChannelData(0);
+        const outR = e.outputBuffer.getChannelData(1);
+        let written = 0;
+
+        while (written < bufferSize && audioQueue.length > 0) {
+          const chunk = audioQueue[0];
+          const available = chunk.left.length - queueReadOffset;
+          const needed = bufferSize - written;
+          const toCopy = Math.min(available, needed);
+
+          outL.set(chunk.left.subarray(queueReadOffset, queueReadOffset + toCopy), written);
+          outR.set(chunk.right.subarray(queueReadOffset, queueReadOffset + toCopy), written);
+
+          written += toCopy;
+          queueReadOffset += toCopy;
+
+          if (queueReadOffset >= chunk.left.length) {
+            audioQueue.shift();
+            queueReadOffset = 0;
+          }
+        }
+
+        // Fill remaining with silence if queue is empty
+        if (written < bufferSize) {
+          outL.fill(0, written);
+          outR.fill(0, written);
+        }
+      };
+
+      scriptNode.connect(audioCtx.destination);
+    }
+
+    function stopAudioPlayback() {
+      if (scriptNode) {
+        scriptNode.disconnect();
+        scriptNode = null;
+      }
+      audioQueue = [];
+      queueReadOffset = 0;
+    }
+
+    function connectBeatSocket(prompt, bpm) {
+      // Close existing connection
+      if (beatSocket) {
+        beatSocket.close();
+        beatSocket = null;
+      }
+
+      stopAudioPlayback();
+
+      beatSocket = new WebSocket(WS_URL);
+
+      beatSocket.onopen = () => {
+        beatSocket.send(JSON.stringify({
+          action: 'start',
+          prompt: prompt,
+          bpm: bpm,
+        }));
+      };
+
+      beatSocket.onmessage = (event) => {
+        if (typeof event.data === 'string') {
+          // Status message
+          const msg = JSON.parse(event.data);
+          const subtitle = document.getElementById('beatSubtitle');
+          if (msg.type === 'status') {
+            if (msg.message === 'connecting') {
+              subtitle.textContent = 'Connecting to Lyria...';
+            } else if (msg.message === 'streaming') {
+              subtitle.textContent = 'Streaming live...';
+              startAudioPlayback();
+              setPlayerUI(true);
+            } else if (msg.message === 'stopped') {
+              subtitle.textContent = 'Stopped';
+            } else if (msg.message === 'updated') {
+              subtitle.textContent = 'Streaming live...';
+            }
+          } else if (msg.type === 'error') {
+            subtitle.textContent = 'Error: ' + msg.message;
+            console.error('Beat error:', msg.message);
+          }
+        } else {
+          // Binary audio data — decode and queue
+          event.data.arrayBuffer().then((buf) => {
+            const pcm = new Uint8Array(buf);
+            const decoded = pcm16ToFloat32Stereo(pcm);
+            audioQueue.push(decoded);
+          });
+        }
+      };
+
+      beatSocket.onerror = (err) => {
+        console.error('WebSocket error:', err);
+        document.getElementById('beatSubtitle').textContent = 'Connection error';
+      };
+
+      beatSocket.onclose = () => {
+        // If it closes unexpectedly while playing, update UI
+        if (beatPlaying) {
+          setPlayerUI(false);
+          beatPlaying = false;
+        }
+      };
+    }
+
+    function setPlayerUI(playing) {
+      const playIcon = document.getElementById('playIcon');
+      const stopIcon = document.getElementById('stopIcon');
+      const viz = document.getElementById('visualizer');
+
+      if (playing) {
+        playIcon.style.display = 'none';
+        stopIcon.style.display = 'block';
+        viz.classList.add('active');
+      } else {
+        playIcon.style.display = 'block';
+        stopIcon.style.display = 'none';
+        viz.classList.remove('active');
+      }
+    }
+
+    // ============================================================
+    // BEAT GENERATOR — public functions called by UI
     // ============================================================
     function generateBeat() {
       const input = document.getElementById('beatInput').value.trim();
@@ -972,12 +1140,9 @@
       const btn = document.getElementById('generateBtn');
       const player = document.getElementById('beatPlayer');
       const title = document.getElementById('beatTitle');
-      const subtitle = document.getElementById('beatSubtitle');
       const vibeTag = document.getElementById('vibeTag');
 
-      btn.textContent = 'Working...';
-      btn.style.pointerEvents = 'none';
-
+      // Vibe detection + color shift
       const vibe = detectVibe(input);
       currentVibe = vibe;
       setVibeColors(vibe);
@@ -989,38 +1154,41 @@
         vibeTag.style.display = 'none';
       }
 
-      // TODO: Replace with real backend call
-      setTimeout(() => {
-        btn.textContent = 'Generate';
-        btn.style.pointerEvents = 'auto';
-        player.classList.add('visible');
-        title.textContent = '"' + input + '"';
-        subtitle.textContent = 'Beat ready — press play';
+      player.classList.add('visible');
+      title.textContent = '"' + input + '"';
+      currentPrompt = input;
+      beatPlaying = true;
 
-        // Add to recent beats
-        addRecentBeat(input, vibe);
-        document.getElementById('beatInput').value = '';
-      }, 1500);
+      // Connect and start streaming immediately
+      connectBeatSocket(input, 120);
+
+      addRecentBeat(input, vibe);
+      document.getElementById('beatInput').value = '';
     }
 
     function toggleBeat() {
-      const playIcon = document.getElementById('playIcon');
-      const stopIcon = document.getElementById('stopIcon');
-      const viz = document.getElementById('visualizer');
       const subtitle = document.getElementById('beatSubtitle');
 
-      beatPlaying = !beatPlaying;
-
       if (beatPlaying) {
-        playIcon.style.display = 'none';
-        stopIcon.style.display = 'block';
-        viz.classList.add('active');
-        subtitle.textContent = 'Playing...';
+        // Kill everything immediately
+        beatPlaying = false;
+
+        // Close the WebSocket so no more data arrives
+        if (beatSocket) {
+          try { beatSocket.send(JSON.stringify({ action: 'stop' })); } catch(e) {}
+          beatSocket.close();
+          beatSocket = null;
+        }
+
+        // Kill audio pipeline and flush buffer
+        stopAudioPlayback();
+        setPlayerUI(false);
+        subtitle.textContent = 'Stopped';
       } else {
-        playIcon.style.display = 'block';
-        stopIcon.style.display = 'none';
-        viz.classList.remove('active');
-        subtitle.textContent = 'Paused';
+        // Restart streaming with same prompt
+        if (!currentPrompt) return;
+        beatPlaying = true;
+        connectBeatSocket(currentPrompt, 120);
       }
     }
 
@@ -1028,7 +1196,6 @@
     // RECENT BEATS
     // ============================================================
     function addRecentBeat(prompt, vibe) {
-      // Add to front, keep max 3
       recentBeats.unshift({ prompt, vibe });
       if (recentBeats.length > 3) recentBeats.pop();
       renderRecentBeats();
@@ -1036,7 +1203,6 @@
 
     function renderRecentBeats() {
       const list = document.getElementById('recentList');
-      const noRecent = document.getElementById('noRecent');
 
       if (recentBeats.length === 0) {
         list.innerHTML = '<div class="no-recent">No beats yet — generate one!</div>';
@@ -1063,10 +1229,8 @@
 
       const player = document.getElementById('beatPlayer');
       const title = document.getElementById('beatTitle');
-      const subtitle = document.getElementById('beatSubtitle');
       const vibeTag = document.getElementById('vibeTag');
 
-      // Apply that beat's vibe colors
       currentVibe = beat.vibe;
       setVibeColors(beat.vibe);
 
@@ -1079,10 +1243,11 @@
 
       player.classList.add('visible');
       title.textContent = '"' + beat.prompt + '"';
-      subtitle.textContent = 'Beat ready — press play';
+      currentPrompt = beat.prompt;
+      beatPlaying = true;
 
-      // Stop current playback if playing
-      if (beatPlaying) toggleBeat();
+      // Start streaming this beat
+      connectBeatSocket(beat.prompt, 120);
     }
   </script>
 </body>

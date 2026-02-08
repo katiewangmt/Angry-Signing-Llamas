@@ -1757,6 +1757,7 @@
     function drawHandLandmarks(landmarks) {
       const canvas = document.getElementById('handCanvas');
       const container = document.getElementById('webcamContainer');
+      const video = document.getElementById('webcamVideo');
       const w = container.clientWidth;
       const h = container.clientHeight;
       canvas.width = w;
@@ -1766,6 +1767,20 @@
 
       if (!landmarks || landmarks.length === 0) return;
 
+      // Account for object-fit: cover — the video is scaled to fill the
+      // container and cropped, so landmark coords (0-1) map to the full
+      // rendered size, not the visible container size.
+      const videoW = video.videoWidth || w;
+      const videoH = video.videoHeight || h;
+      const scale = Math.max(w / videoW, h / videoH);
+      const renderedW = videoW * scale;
+      const renderedH = videoH * scale;
+      const offX = (renderedW - w) / 2;
+      const offY = (renderedH - h) / 2;
+
+      function mapX(x) { return x * renderedW - offX; }
+      function mapY(y) { return y * renderedH - offY; }
+
       // Draw connections
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
       ctx.lineWidth = 2;
@@ -1773,8 +1788,8 @@
         const [x1, y1] = landmarks[i];
         const [x2, y2] = landmarks[j];
         ctx.beginPath();
-        ctx.moveTo(x1 * w, y1 * h);
-        ctx.lineTo(x2 * w, y2 * h);
+        ctx.moveTo(mapX(x1), mapY(y1));
+        ctx.lineTo(mapX(x2), mapY(y2));
         ctx.stroke();
       }
 
@@ -1782,7 +1797,7 @@
       const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent');
       for (const [x, y] of landmarks) {
         ctx.beginPath();
-        ctx.arc(x * w, y * h, 5, 0, Math.PI * 2);
+        ctx.arc(mapX(x), mapY(y), 5, 0, Math.PI * 2);
         ctx.fillStyle = accentColor;
         ctx.fill();
         ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';

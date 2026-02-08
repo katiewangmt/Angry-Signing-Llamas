@@ -10,6 +10,9 @@ import json
 import os
 import sys
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -45,7 +48,7 @@ static_model = None
 lstm_model = None
 
 # ── FastAPI App ─────────────────────────────────────────
-app = FastAPI(title="SignCraft Beat Generator")
+app = FastAPI(title="Angry Silent Lamas")
 
 app.add_middleware(
     CORSMiddleware,

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SignCraft</title>
+  <title>Angry Silent Lamas [ASL]</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     [data-theme="dark"] {
@@ -95,12 +95,16 @@
 
     .logo {
       font-family: 'Press Start 2P', cursive;
-      font-size: 28px;
-      color: var(--text-primary);
+      font-size: 12px;
+      color: var(--text-secondary);
       transition: color 0.6s;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
     }
 
-    .logo span {
+    .logo .big {
+      font-size: 32px;
       color: var(--accent);
       text-shadow: 3px 3px 0px var(--accent-dim);
       transition: color 0.6s, text-shadow 0.6s;
@@ -684,7 +688,7 @@
       100% { opacity: 0.7; transform: scale(0.98); }
     }
 
-    .color-shifting .logo span {
+    .color-shifting .logo .big {
       animation: color-pulse 0.6s ease-out;
     }
 
@@ -713,7 +717,7 @@
 
     <!-- HEADER -->
     <header class="header fade-in">
-      <div class="logo">Sign<span>Craft</span></div>
+      <div class="logo"><span class="big">A</span>ngry <span class="big">S</span>ilent <span class="big">L</span>amas</div>
       <div class="header-side">
         <div class="theme-toggle" onclick="toggleTheme()">
           <span class="toggle-icon">🌙</span>
@@ -810,7 +814,7 @@
       </div>
     </div>
 
-    <div class="footer fade-in">SignCraft v1.0 — built at ADI 2026</div>
+    <div class="footer fade-in">Angry Silent Lamas v1.0 — built at ADI 2026</div>
   </div>
 
   <script>
@@ -962,22 +966,21 @@
       }
     }
 
-    function startFpsCounter() {
-      const fpsTag = document.getElementById('fpsTag');
-      let lastTime = performance.now();
-      let frames = 0;
-      function tick() {
-        if (!cameraOn) { fpsTag.textContent = '-- fps'; return; }
-        frames++;
-        const now = performance.now();
-        if (now - lastTime >= 1000) {
-          fpsTag.textContent = frames + ' fps';
-          frames = 0;
-          lastTime = now;
-        }
-        requestAnimationFrame(tick);
+    let aslFramesReceived = 0;
+    let aslFpsLastTime = performance.now();
+
+    function updateAslFps() {
+      aslFramesReceived++;
+      const now = performance.now();
+      if (now - aslFpsLastTime >= 1000) {
+        document.getElementById('fpsTag').textContent = aslFramesReceived + ' fps';
+        aslFramesReceived = 0;
+        aslFpsLastTime = now;
       }
-      requestAnimationFrame(tick);
+    }
+
+    function startFpsCounter() {
+      document.getElementById('fpsTag').textContent = '-- fps';
     }
 
     // ============================================================
@@ -1103,10 +1106,13 @@
     function handleASLMessage(event) {
       const msg = JSON.parse(event.data);
 
-      if (msg.type === 'status' && msg.landmarks) {
-        drawHandLandmarks(msg.landmarks);
-      } else if (msg.type === 'status' && msg.hand_detected === false) {
-        drawHandLandmarks(null);
+      if (msg.type === 'status') {
+        updateAslFps();
+        if (msg.landmarks) {
+          drawHandLandmarks(msg.landmarks);
+        } else {
+          drawHandLandmarks(null);
+        }
       }
 
       if (msg.type === 'detection') {

@@ -379,11 +379,12 @@ async def asl_detect(ws: WebSocket):
 
 
 # ── Text-to-Speech (ElevenLabs) ───────────────────────────────────────
-ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "0bbe00bc30909760c07ccaf8a4b5391e134f9a4972761478782f92a6f20fba5d")
+ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY") or "0bbe00bc30909760c07ccaf8a4b5391e134f9a4972761478782f92a6f20fba5d"
 ELEVENLABS_BASE_URL = "https://api.elevenlabs.io/v1"
 
 class TTSRequest(BaseModel):
     text: str
+    voice_id: str = "21m00Tcm4TlvDq8ikWAM"  # Default: Rachel
 
 @app.post("/api/tts")
 async def text_to_speech(request: TTSRequest):
@@ -393,23 +394,26 @@ async def text_to_speech(request: TTSRequest):
     """
     if not HTTPX_AVAILABLE:
         return Response(content="httpx not available", status_code=503)
-    
+
+    if not ELEVENLABS_API_KEY:
+        return Response(content="ELEVENLABS_API_KEY not set in .env", status_code=503)
+
     text = request.text
     if not text or not text.strip():
         return Response(content="No text provided", status_code=400)
-    
+
     try:
-        voice_id = "pNInz6obpgDQGcFmaJgB"  # Adam voice
-        
+        voice_id = request.voice_id
+
         url = f"{ELEVENLABS_BASE_URL}/text-to-speech/{voice_id}"
-        
+
         payload = {
             "text": text,
-            "model_id": "eleven_turbo_v2_5",
+            "model_id": "eleven_multilingual_v2",
             "voice_settings": {
-                "stability": 0.4,
-                "similarity_boost": 0.75,
-                "style": 0.85,
+                "stability": 0.5,
+                "similarity_boost": 0.8,
+                "style": 0.7,
                 "use_speaker_boost": True
             }
         }

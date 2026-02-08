@@ -27,7 +27,7 @@ STABLE_FRAMES = 4
 COOLDOWN_FRAMES = 6
 
 LSTM_CONFIDENCE_THRESHOLD = 0.3
-PREDICTION_INTERVAL = 2
+PREDICTION_INTERVAL = 1
 
 WORD_TO_LETTER = {
     "THANK_YOU": "T",
@@ -54,6 +54,9 @@ class PredictionSmoother:
     def update(self, prediction, confidence):
         if self.cooldown_counter > 0:
             self.cooldown_counter -= 1
+            if self.cooldown_counter == 0:
+                # Allow re-detecting the same sign after cooldown
+                self.last_accepted = None
 
         if confidence < self.confidence_threshold:
             self.window.append(None)
@@ -103,14 +106,14 @@ class ASLDetectionSession:
         self.smoother = PredictionSmoother(
             window_size=8,
             stable_count=STABLE_FRAMES,
-            cooldown=20,
+            cooldown=8,
         )
 
-        # Word smoothing — slower switching for TTS readout
+        # Word smoothing
         self.word_smoother = PredictionSmoother(
-            window_size=12,
-            stable_count=6,
-            cooldown=45,
+            window_size=8,
+            stable_count=3,
+            cooldown=10,
             confidence_threshold=LSTM_CONFIDENCE_THRESHOLD,
         )
 

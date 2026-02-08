@@ -1,61 +1,80 @@
-# How to Run SignCraft (Hackathon Mode)
+# How to Run SignCraft Web App
 
-SignCraft runs as **one server**: the backend serves the frontend + websockets + ASL.
+## Quick Start (Easiest Method)
 
-## Quick Start (recommended)
+### Using the Startup Scripts
 
-From the repo root:
-
+**Terminal 1 - Backend:**
 ```bash
-chmod +x run_local.sh
-./run_local.sh
+cd ADI
+./start-backend.sh
 ```
 
-Open: `http://localhost:8000`
-
-## “Professional demo” (public HTTPS link, still fast)
-
-This keeps ASL running on your laptop CPU (fast), but gives you a shareable URL for judges.
-
-1) Install Cloudflare Tunnel:
-
-- **macOS**:
-
+**Terminal 2 - Frontend:**
 ```bash
-brew install cloudflare/cloudflare/cloudflared
+cd ADI
+./start-frontend.sh
 ```
 
-- **Windows**:
+Then open **http://localhost:3000** in your browser.
+
+---
+
+## Manual Start
+
+### 1. Start the Backend Server
+
+Open a terminal and run:
 
 ```bash
-winget install Cloudflare.cloudflared
+cd ADI/test-backend
+pip install -r requirements.txt
+uvicorn server:app --reload --port 8000
 ```
 
-2) Run:
+The backend will start on `http://localhost:8000`
+
+### 2. Start the Frontend
+
+Open another terminal and run:
 
 ```bash
-chmod +x share_public.sh
-./share_public.sh
+cd ADI/frontend
+# Option 1: Using Python's built-in server
+python3 -m http.server 3000
+# or
+python -m http.server 3000
+
+# Option 2: Using npx serve (if you have Node.js)
+npx serve . -p 3000
 ```
 
-Copy the `https://*.trycloudflare.com` URL from the terminal and use it for your demo.
+### 3. Open in Browser
 
-## Environment variables
+Open your browser and go to:
+- **http://localhost:3000** (or the port you chose)
 
-### Beat generator (optional)
+## What You'll See
 
-Create `test-backend/.env` (do not commit it) with:
-
-```bash
-GEMINI_API_KEY='your-key-here'
-```
+- **Live Feed**: Webcam feed with ASL detection
+- **Detected Signs**: Real-time letter/word detection
+- **ASL Alphabet Tutorial**: Scrollable grid showing all 26 letters with sign images
+- **Beat Generator**: (Optional) Music generation feature
 
 ## Troubleshooting
 
-- **No webcam**: allow camera permissions in the browser
-- **Port in use**: set a different port:
+### Backend Issues
+- Make sure TensorFlow models are in `ADI/asl-detector/`:
+  - `asl_model.keras` (for letters)
+  - `asl_lstm_model.keras` (for words)
+- Check that all dependencies are installed: `pip install -r requirements.txt`
 
-```bash
-PORT=8010 ./run_local.sh
-```
+### Frontend Issues
+- Make sure the backend is running on port 8000
+- Check browser console for CORS errors
+- Allow camera access when prompted
+
+### Port Conflicts
+- If port 8000 is taken, change the backend port and update `API_BASE` in `frontend/index.html`
+- If port 3000 is taken, use a different port for the frontend server
 

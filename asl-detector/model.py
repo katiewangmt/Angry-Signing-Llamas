@@ -84,7 +84,22 @@ def get_callbacks(patience=10):
 
 def load_trained_model(path="asl_model.keras") -> keras.Model:
     """Load a previously trained model."""
-    return keras.models.load_model(path)
+    try:
+        # Try loading with safe_mode=False to handle quantization_config issues
+        return keras.models.load_model(path, safe_mode=False)
+    except Exception as e:
+        # If that fails, try with compile=False
+        try:
+            model = keras.models.load_model(path, compile=False)
+            # Recompile with the same settings
+            model.compile(
+                optimizer=keras.optimizers.Adam(learning_rate=1e-3),
+                loss="sparse_categorical_crossentropy",
+                metrics=["accuracy"],
+            )
+            return model
+        except Exception as e2:
+            raise Exception(f"Could not load model: {e}. Also tried compile=False: {e2}")
 
 
 if __name__ == "__main__":

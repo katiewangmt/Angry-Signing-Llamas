@@ -1864,10 +1864,8 @@
       aslSocket.onmessage = (event) => {
         awaitingAslResponse = false;
         handleASLMessage(event);
-        // Send next frame immediately for high framerate (flow control handled by awaitingAslResponse)
-        if (isDetecting) {
-          sendFrame();
-        }
+        // Send next frame paced by requestAnimationFrame (flow control)
+        scheduleNextFrame();
       };
 
       aslSocket.onerror = (err) => {
@@ -1879,7 +1877,7 @@
         isDetecting = false;
         aslSocket = null;
         if (frameLoopTimer) {
-          cancelAnimationFrame(frameLoopTimer);
+          clearTimeout(frameLoopTimer);
           frameLoopTimer = null;
         }
       };
@@ -1889,7 +1887,7 @@
       isDetecting = false;
       awaitingAslResponse = false;
       if (frameLoopTimer) {
-        cancelAnimationFrame(frameLoopTimer);
+        clearTimeout(frameLoopTimer);
         frameLoopTimer = null;
       }
       if (aslSocket) {
@@ -1928,11 +1926,8 @@
 
     function scheduleNextFrame() {
       if (!isDetecting) return;
-      // Use requestAnimationFrame for smooth, high framerate sending
-      // This ensures frames are sent as fast as the backend can process them
-      frameLoopTimer = requestAnimationFrame(() => {
-        sendFrame();
-      });
+      // Small delay to avoid spinning too fast, but mostly paced by backend response time
+      frameLoopTimer = setTimeout(sendFrame, 16);
     }
 
     // Legacy name kept for startASLDetection's onopen call

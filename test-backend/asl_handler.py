@@ -23,8 +23,8 @@ from model_lstm import SEQUENCE_LENGTH, SEQUENCE_LABELS
 
 # ── Detection thresholds (matching detect_unified.py) ──────────
 STATIC_CONFIDENCE_THRESHOLD = 0.65
-STABLE_FRAMES = 8
-COOLDOWN_FRAMES = 15
+STABLE_FRAMES = 4
+COOLDOWN_FRAMES = 6
 
 LSTM_CONFIDENCE_THRESHOLD = 0.3
 PREDICTION_INTERVAL = 5
@@ -99,7 +99,7 @@ class ASLDetectionSession:
 
         # Letter smoothing
         self.smoother = PredictionSmoother(
-            window_size=12,
+            window_size=6,
             stable_count=STABLE_FRAMES,
             cooldown=COOLDOWN_FRAMES,
         )
@@ -160,8 +160,11 @@ class ASLDetectionSession:
         else:
             landmarks = None
 
-        # Always send hand status
-        results_out.append({"type": "status", "hand_detected": hand_detected})
+        # Always send hand status + landmarks for drawing
+        status = {"type": "status", "hand_detected": hand_detected}
+        if hand_detected:
+            status["landmarks"] = [[lm.x, lm.y] for lm in hand]
+        results_out.append(status)
 
         # ── Letter detection ──
         if self.mode == "letters" and self.static_model is not None:

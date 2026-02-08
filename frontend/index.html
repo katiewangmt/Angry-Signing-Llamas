@@ -738,6 +738,7 @@
             <button class="cam-btn" id="camBtn" onclick="toggleCamera()">Start Camera</button>
           </div>
           <video id="webcamVideo" autoplay playsinline style="display:none;"></video>
+          <canvas id="handCanvas" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
           <div class="webcam-overlay" id="webcamOverlay" style="display:none;">
             <div class="overlay-tag">ASL Detect</div>
             <div class="overlay-tag" id="fpsTag">-- fps</div>
@@ -1050,11 +1051,63 @@
         data: dataUrl,
       }));
 
-      frameLoopTimer = setTimeout(sendFrameLoop, 100); // 10fps
+      frameLoopTimer = setTimeout(sendFrameLoop, 66); // ~15fps
+    }
+
+    const HAND_CONNECTIONS = [
+      [0,1],[1,2],[2,3],[3,4],
+      [0,5],[5,6],[6,7],[7,8],
+      [0,9],[9,10],[10,11],[11,12],
+      [0,13],[13,14],[14,15],[15,16],
+      [0,17],[17,18],[18,19],[19,20],
+      [5,9],[9,13],[13,17],
+    ];
+
+    function drawHandLandmarks(landmarks) {
+      const canvas = document.getElementById('handCanvas');
+      const container = document.getElementById('webcamContainer');
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, w, h);
+
+      if (!landmarks || landmarks.length === 0) return;
+
+      // Draw connections
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.lineWidth = 2;
+      for (const [i, j] of HAND_CONNECTIONS) {
+        const [x1, y1] = landmarks[i];
+        const [x2, y2] = landmarks[j];
+        ctx.beginPath();
+        ctx.moveTo(x1 * w, y1 * h);
+        ctx.lineTo(x2 * w, y2 * h);
+        ctx.stroke();
+      }
+
+      // Draw joints
+      const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+      for (const [x, y] of landmarks) {
+        ctx.beginPath();
+        ctx.arc(x * w, y * h, 5, 0, Math.PI * 2);
+        ctx.fillStyle = accentColor;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
     }
 
     function handleASLMessage(event) {
       const msg = JSON.parse(event.data);
+
+      if (msg.type === 'status' && msg.landmarks) {
+        drawHandLandmarks(msg.landmarks);
+      } else if (msg.type === 'status' && msg.hand_detected === false) {
+        drawHandLandmarks(null);
+      }
 
       if (msg.type === 'detection') {
         if (msg.kind === 'letter') {

@@ -31,9 +31,9 @@ PREDICTION_INTERVAL = 2
 
 WORD_TO_LETTER = {
     "THANK_YOU": "T",
-    "OK": "SPACE",  # OK sign triggers space
+    "OK": "O",
     "HELLO": "H",
-    "GOODBYE": "DELETE",  # GOODBYE sign triggers delete
+    "GOODBYE": "G",
     "I_LOVE_YOU": "I",
     "6_7": "6",
 }
@@ -101,16 +101,16 @@ class ASLDetectionSession:
 
         # Letter smoothing
         self.smoother = PredictionSmoother(
-            window_size=6,
+            window_size=8,
             stable_count=STABLE_FRAMES,
-            cooldown=COOLDOWN_FRAMES,
+            cooldown=20,
         )
 
-        # Word smoothing — same pattern as letters
+        # Word smoothing — slower switching for TTS readout
         self.word_smoother = PredictionSmoother(
-            window_size=8,
-            stable_count=4,
-            cooldown=8,
+            window_size=12,
+            stable_count=6,
+            cooldown=45,
             confidence_threshold=LSTM_CONFIDENCE_THRESHOLD,
         )
 

@@ -13,7 +13,7 @@ from landmarks import NUM_FEATURES
 
 # Sequence configuration (should match collect_sequence_data.py)
 SEQUENCE_LENGTH = 30
-SEQUENCE_LABELS = ["I_LOVE_YOU", "THANK_YOU", "WORD_3", "WORD_4", "WORD_5", "6_7", "OK", "HELLO", "GOODBYE"]
+SEQUENCE_LABELS = ["I_LOVE_YOU", "THANK_YOU", "SIGMA", "BADDIE", "RIZZ", "6_7", "OK", "HELLO", "GOODBYE"]
 NUM_SEQUENCE_CLASSES = len(SEQUENCE_LABELS)
 
 

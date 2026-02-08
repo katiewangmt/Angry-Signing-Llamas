@@ -46,7 +46,7 @@ WINDOW_NAME = "ASL Sequence Data Collector"
 FPS = 30
 
 # Sequence-based ASL signs
-SEQUENCE_LABELS = ["I_LOVE_YOU", "THANK_YOU", "WORD_3", "WORD_4", "WORD_5", "6_7", "OK", "HELLO", "GOODBYE"]
+SEQUENCE_LABELS = ["I_LOVE_YOU", "THANK_YOU", "SIGMA", "BADDIE", "RIZZ", "6_7", "OK", "HELLO", "GOODBYE"]
 NUM_SEQUENCE_CLASSES = len(SEQUENCE_LABELS)
 
 
@@ -154,8 +154,8 @@ def draw_ui(frame, current_label, sequences_data, labels_data, recording, hand_d
                     cv2.FONT_HERSHEY_SIMPLEX, 0.4, (180, 180, 180), 1)
 
     # Controls help
-    cv2.putText(frame, "[1] I love you  [2] Thank you  [S] 6 7  [T] Thank you  [O] OK  [H] Hello  [G] Goodbye",
-                (10, h - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 150), 1)
+    cv2.putText(frame, "[1] ILY [2] ThankU [3/X] Sigma [4/B] Baddie [5/R] Rizz [S] 67 [O] OK [H] Hi [G] Bye",
+                (10, h - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (150, 150, 150), 1)
     cv2.putText(frame, "[SPACE] Record  [TAB] Save  [ESC] Quit",
                 (10, h - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 150), 1)
 
@@ -169,8 +169,10 @@ def main():
     print("\nControls:")
     print("  [1]     → Select 'I love you'")
     print("  [2]     → Select 'Thank you'")
+    print("  [3/X]   → Select 'Sigma'")
+    print("  [4/B]   → Select 'Baddie'")
+    print("  [5/R]   → Select 'Rizz'")
     print("  [S]     → Select '6 7'")
-    print("  [T]     → Select 'Thank you'")
     print("  [O]     → Select 'OK'")
     print("  [H]     → Select 'Hello'")
     print("  [G]     → Select 'Goodbye'")
@@ -294,6 +296,15 @@ def main():
             print(f"  🔤 Selected: {SEQUENCE_LABELS[current_label]}")
         elif key == ord('g') or key == ord('G'):
             current_label = 8  # GOODBYE (index 8)
+            print(f"  🔤 Selected: {SEQUENCE_LABELS[current_label]}")
+        elif key == ord('3') or key == ord('x') or key == ord('X'):
+            current_label = 2  # SIGMA (index 2)
+            print(f"  🔤 Selected: {SEQUENCE_LABELS[current_label]}")
+        elif key == ord('4') or key == ord('b') or key == ord('B'):
+            current_label = 3  # BADDIE (index 3)
+            print(f"  🔤 Selected: {SEQUENCE_LABELS[current_label]}")
+        elif key == ord('5') or key == ord('r') or key == ord('R'):
+            current_label = 4  # RIZZ (index 4)
             print(f"  🔤 Selected: {SEQUENCE_LABELS[current_label]}")
 
     # Save on exit

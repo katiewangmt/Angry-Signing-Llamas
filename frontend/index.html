@@ -13,8 +13,8 @@
       --accent: #4ade80;
       --accent-dim: rgba(74, 222, 128, 0.12);
       --accent-glow: rgba(74, 222, 128, 0.35);
-      --text-primary: #e2e8f0;
-      --text-secondary: #7a8baa;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
       --border: #2d3f5e;
       --danger: #ff4466;
       --toggle-bg: #2d3f5e;
@@ -95,16 +95,23 @@
 
     .logo {
       font-family: 'Press Start 2P', cursive;
-      font-size: 12px;
-      color: var(--text-secondary);
+      font-size: 13px;
+      color: var(--text-primary);
       transition: color 0.6s;
       display: flex;
-      align-items: baseline;
-      gap: 4px;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .logo-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      image-rendering: pixelated;
     }
 
     .logo .big {
-      font-size: 32px;
+      font-size: 30px;
       color: var(--accent);
       text-shadow: 3px 3px 0px var(--accent-dim);
       transition: color 0.6s, text-shadow 0.6s;
@@ -161,10 +168,10 @@
 
     .section-label {
       font-family: 'Press Start 2P', cursive;
-      font-size: 11px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: var(--text-secondary);
+      color: var(--text-primary);
       transition: color 0.4s;
       flex-shrink: 0;
     }
@@ -274,7 +281,7 @@
 
     /* RIGHT: CONTROLS */
     .right-panel {
-      width: 360px;
+      width: 420px;
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -332,6 +339,224 @@
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
+    }
+
+    /* === TAB NAVIGATION === */
+    .tab-nav {
+      display: flex;
+      gap: 0;
+      border: 3px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 3px 3px 0px var(--shadow);
+      transition: border-color 0.6s, box-shadow 0.4s;
+      margin-bottom: 20px;
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 14px 8px;
+      background: var(--bg-card);
+      border: none;
+      color: var(--text-secondary);
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn + .tab-btn {
+      border-left: 3px solid var(--border);
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: var(--bg-primary);
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: var(--accent-dim);
+      color: var(--text-primary);
+    }
+
+    .tab-content { display: none; flex-direction: column; gap: 0; flex: 1; min-height: 0; overflow-y: auto; }
+    .tab-content.active { display: flex; }
+
+    /* === TUTORIAL === */
+    .tutorial-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-shrink: 0;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 14px;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.4s ease, background 0.6s;
+      width: 0%;
+    }
+
+    .progress-text {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 12px;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .tutorial-card {
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      border-radius: 4px;
+      padding: 24px;
+      box-shadow: 4px 4px 0px var(--shadow);
+      transition: all 0.4s;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .tutorial-card.correct {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .tutorial-sign-name {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 32px;
+      color: var(--accent);
+      text-align: center;
+      transition: color 0.6s;
+    }
+
+    .tutorial-image {
+      width: 200px;
+      height: 200px;
+      background: var(--bg-secondary);
+      border: 3px solid var(--border);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .tutorial-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .tutorial-image .placeholder-letter {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 64px;
+      color: var(--border);
+      opacity: 0.5;
+    }
+
+    .tutorial-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      color: var(--text-primary);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .tutorial-dynamic {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      text-align: center;
+      font-style: italic;
+      transition: color 0.6s;
+    }
+
+    .tutorial-status {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 12px;
+      padding: 10px 24px;
+      border-radius: 2px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .tutorial-status.waiting {
+      color: var(--text-secondary);
+    }
+
+    .tutorial-status.correct {
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+    }
+
+    .tutorial-actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .tutorial-actions button {
+      flex: 1;
+      padding: 14px 16px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 11px;
+      border-radius: 2px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      box-shadow: 3px 3px 0px var(--shadow);
+    }
+
+    .skip-btn {
+      background: var(--bg-secondary);
+      border: 3px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .skip-btn:hover {
+      border-color: var(--text-secondary);
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px var(--shadow);
+    }
+
+    .tutorial-complete {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .tutorial-complete .big-emoji {
+      font-size: 48px;
+    }
+
+    .tutorial-complete .complete-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 14px;
+      color: var(--accent);
+    }
+
+    .tutorial-complete .complete-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
     }
 
     /* === MODE TOGGLE === */
@@ -405,8 +630,8 @@
 
     .beat-input::placeholder {
       color: var(--text-secondary);
-      opacity: 0.5;
-      font-size: 12px;
+      opacity: 0.7;
+      font-size: 13px;
     }
 
     .beat-input:focus {
@@ -665,7 +890,7 @@
       font-family: 'Press Start 2P', cursive;
       font-size: 8px;
       color: var(--text-secondary);
-      opacity: 0.4;
+      opacity: 0.6;
       letter-spacing: 1px;
       transition: color 0.4s;
       flex-shrink: 0;
@@ -708,7 +933,9 @@
         aspect-ratio: 16 / 9;
         flex: none;
       }
-      .logo { font-size: 20px; }
+      .logo { font-size: 11px; }
+      .logo-img { width: 36px; height: 36px; }
+      .logo .big { font-size: 22px; }
     }
   </style>
 </head>
@@ -717,7 +944,7 @@
 
     <!-- HEADER -->
     <header class="header fade-in">
-      <div class="logo"><span class="big">A</span>ngry <span class="big">S</span>ilent <span class="big">L</span>amas</div>
+      <div class="logo"><img src="angrylama.webp" class="logo-img" alt=""><span class="big">A</span>ngry <span class="big">S</span>ilent <span class="big">L</span>amas</div>
       <div class="header-side">
         <div class="theme-toggle" onclick="toggleTheme()">
           <span class="toggle-icon">🌙</span>
@@ -732,7 +959,6 @@
 
       <!-- LEFT: WEBCAM -->
       <div class="left-panel">
-        <div class="section-label">Live Feed</div>
         <div class="webcam-container" id="webcamContainer">
           <div class="webcam-placeholder" id="webcamPlaceholder">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -758,58 +984,85 @@
       <!-- RIGHT: CONTROLS -->
       <div class="right-panel">
 
-        <!-- DETECTED SIGNS -->
-        <section class="detection-section">
-          <div class="section-label">Detected Signs</div>
-          <div class="mode-toggle">
-            <button class="mode-btn active" id="modeBtnLetters" onclick="setASLMode('letters')">Letters</button>
-            <button class="mode-btn" id="modeBtnWords" onclick="setASLMode('words')">Words</button>
-          </div>
-          <div class="detected-output">
-            <div class="detected-text" id="detectedText"><span class="cursor"></span></div>
-          </div>
-        </section>
+        <!-- TAB NAVIGATION -->
+        <div class="tab-nav">
+          <button class="tab-btn active" onclick="switchTab('tutorial')">Tutorial</button>
+          <button class="tab-btn" onclick="switchTab('freestyle')">Freestyle</button>
+          <button class="tab-btn" onclick="switchTab('challenge')">Challenge</button>
+        </div>
 
         <!-- Hidden canvas for frame capture -->
         <canvas id="aslCanvas" width="320" height="240" style="display:none;"></canvas>
 
-        <!-- BEAT GENERATOR -->
-        <section class="beat-section">
-          <div class="section-label">Beat Generator</div>
-          <div class="beat-input-row">
-            <input type="text" class="beat-input" id="beatInput" placeholder="Describe a beat..."/>
-            <button class="generate-btn" id="generateBtn" onclick="generateBeat()">Generate</button>
+        <!-- ==================== TAB 1: TUTORIAL ==================== -->
+        <div class="tab-content active" id="tabTutorial">
+          <div class="tutorial-progress" style="margin-top:4px;">
+            <div class="progress-bar"><div class="progress-fill" id="tutorialProgressFill"></div></div>
+            <div class="progress-text" id="tutorialProgressText">0/35</div>
           </div>
-          <div class="beat-player" id="beatPlayer">
-            <button class="play-stop-btn" id="playStopBtn" onclick="toggleBeat()">
-              <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-              <svg id="stopIcon" viewBox="0 0 24 24" style="display:none;"><rect x="4" y="4" width="16" height="16"/></svg>
-            </button>
-            <div class="beat-info">
-              <div class="beat-title" id="beatTitle">Generated beat</div>
-              <div class="beat-subtitle" id="beatSubtitle">Ready to play</div>
-            </div>
-            <div class="vibe-tag" id="vibeTag" style="display:none;">chill</div>
-            <div class="visualizer" id="visualizer">
-              <div class="viz-bar" style="height:8px;"></div>
-              <div class="viz-bar" style="height:14px;"></div>
-              <div class="viz-bar" style="height:6px;"></div>
-              <div class="viz-bar" style="height:20px;"></div>
-              <div class="viz-bar" style="height:10px;"></div>
-              <div class="viz-bar" style="height:16px;"></div>
-              <div class="viz-bar" style="height:8px;"></div>
-              <div class="viz-bar" style="height:12px;"></div>
-            </div>
-          </div>
-        </section>
+          <div id="tutorialCardContainer"></div>
+        </div>
 
-        <!-- RECENT BEATS -->
-        <section class="recent-section">
-          <div class="section-label">Recent Beats</div>
-          <div class="recent-list" id="recentList">
-            <div class="no-recent" id="noRecent">No beats yet — generate one!</div>
+        <!-- ==================== TAB 2: FREESTYLE ==================== -->
+        <div class="tab-content" id="tabFreestyle">
+          <!-- DETECTED SIGNS -->
+          <section class="detection-section">
+            <div class="section-label">Detected Signs</div>
+            <div class="mode-toggle">
+              <button class="mode-btn active" id="modeBtnLetters" onclick="setASLMode('letters')">Letters</button>
+              <button class="mode-btn" id="modeBtnWords" onclick="setASLMode('words')">Words</button>
+            </div>
+            <div class="detected-output">
+              <div class="detected-text" id="detectedText"><span class="cursor"></span></div>
+            </div>
+          </section>
+
+          <!-- BEAT GENERATOR -->
+          <section class="beat-section">
+            <div class="section-label">Beat Generator</div>
+            <div class="beat-input-row">
+              <input type="text" class="beat-input" id="beatInput" placeholder="Describe a beat..."/>
+              <button class="generate-btn" id="generateBtn" onclick="generateBeat()">Generate</button>
+            </div>
+            <div class="beat-player" id="beatPlayer">
+              <button class="play-stop-btn" id="playStopBtn" onclick="toggleBeat()">
+                <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                <svg id="stopIcon" viewBox="0 0 24 24" style="display:none;"><rect x="4" y="4" width="16" height="16"/></svg>
+              </button>
+              <div class="beat-info">
+                <div class="beat-title" id="beatTitle">Generated beat</div>
+                <div class="beat-subtitle" id="beatSubtitle">Ready to play</div>
+              </div>
+              <div class="vibe-tag" id="vibeTag" style="display:none;">chill</div>
+              <div class="visualizer" id="visualizer">
+                <div class="viz-bar" style="height:8px;"></div>
+                <div class="viz-bar" style="height:14px;"></div>
+                <div class="viz-bar" style="height:6px;"></div>
+                <div class="viz-bar" style="height:20px;"></div>
+                <div class="viz-bar" style="height:10px;"></div>
+                <div class="viz-bar" style="height:16px;"></div>
+                <div class="viz-bar" style="height:8px;"></div>
+                <div class="viz-bar" style="height:12px;"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- RECENT BEATS -->
+          <section class="recent-section">
+            <div class="section-label">Recent Beats</div>
+            <div class="recent-list" id="recentList">
+              <div class="no-recent" id="noRecent">No beats yet — generate one!</div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ==================== TAB 3: CHALLENGE ==================== -->
+        <div class="tab-content" id="tabChallenge">
+          <div class="section-label">Challenge</div>
+          <div style="padding:30px 10px;text-align:center;">
+            <div style="font-family:'Press Start 2P',cursive;font-size:10px;color:var(--text-secondary);opacity:0.5;">Coming soon...</div>
           </div>
-        </section>
+        </div>
 
       </div>
     </div>
@@ -1005,6 +1258,10 @@
 
       aslSocket.onopen = () => {
         isDetecting = true;
+        // Set mode for current tab
+        if (activeTab === 'tutorial') {
+          updateTutorialMode();
+        }
         sendFrameLoop();
       };
 
@@ -1121,6 +1378,8 @@
         } else if (msg.kind === 'word') {
           showDetection(msg.word || msg.value);
         }
+        // Check tutorial match
+        checkTutorialDetection(msg);
       }
     }
 
@@ -1136,6 +1395,182 @@
         aslSocket.send(JSON.stringify({ action: 'set_mode', mode: mode }));
       }
     }
+
+    // ============================================================
+    // TAB NAVIGATION
+    // ============================================================
+    let activeTab = 'tutorial';
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        const tabs = ['tutorial', 'freestyle', 'challenge'];
+        btn.classList.toggle('active', tabs[i] === tab);
+      });
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+
+      // Set ASL mode based on active tab
+      if (tab === 'tutorial') {
+        updateTutorialMode();
+      }
+    }
+
+    // ============================================================
+    // TUTORIAL
+    // ============================================================
+    const TUTORIAL_SIGNS = [
+      // Letters A-Z
+      { name: 'A', mode: 'letters', match: 'A', desc: 'Make a fist with your thumb resting on the side', img: 'signs/A.png' },
+      { name: 'B', mode: 'letters', match: 'B', desc: 'Flat hand, fingers together pointing up, thumb tucked across palm', img: 'signs/B.png' },
+      { name: 'C', mode: 'letters', match: 'C', desc: 'Curve your hand into a C shape', img: 'signs/C.png' },
+      { name: 'D', mode: 'letters', match: 'D', desc: 'Index finger up, other fingers curl down to touch thumb', img: 'signs/D.png' },
+      { name: 'E', mode: 'letters', match: 'E', desc: 'Curl all fingers down, thumb tucked under fingers', img: 'signs/E.png' },
+      { name: 'F', mode: 'letters', match: 'F', desc: 'Index and thumb form a circle, other 3 fingers spread up', img: 'signs/F.png' },
+      { name: 'G', mode: 'letters', match: 'G', desc: 'Index finger and thumb pointing sideways, parallel', img: 'signs/G.png' },
+      { name: 'H', mode: 'letters', match: 'H', desc: 'Index and middle fingers extended sideways together', img: 'signs/H.png' },
+      { name: 'I', mode: 'letters', match: 'I', desc: 'Make a fist with only your pinky raised', img: 'signs/I.png' },
+      { name: 'J', mode: 'letters', match: 'J', desc: 'Start with pinky up, trace a J shape downward', img: 'signs/J.png' },
+      { name: 'K', mode: 'letters', match: 'K', desc: 'Index and middle finger up in a V, thumb between them', img: 'signs/K.png' },
+      { name: 'L', mode: 'letters', match: 'L', desc: 'L shape — index finger up, thumb out to the side', img: 'signs/L.png' },
+      { name: 'M', mode: 'letters', match: 'M', desc: 'Fist with thumb tucked under three fingers', img: 'signs/M.png' },
+      { name: 'N', mode: 'letters', match: 'N', desc: 'Fist with thumb tucked under two fingers', img: 'signs/N.png' },
+      { name: 'O', mode: 'letters', match: 'O', desc: 'All fingertips touch thumb forming an O', img: 'signs/O.png' },
+      { name: 'P', mode: 'letters', match: 'P', desc: 'Like K but pointing downward', img: 'signs/P.png' },
+      { name: 'Q', mode: 'letters', match: 'Q', desc: 'Like G but pointing downward', img: 'signs/Q.png' },
+      { name: 'R', mode: 'letters', match: 'R', desc: 'Cross your index and middle fingers', img: 'signs/R.png' },
+      { name: 'S', mode: 'letters', match: 'S', desc: 'Fist with thumb over the front of fingers', img: 'signs/S.png' },
+      { name: 'T', mode: 'letters', match: 'T', desc: 'Fist with thumb tucked between index and middle finger', img: 'signs/T.png' },
+      { name: 'U', mode: 'letters', match: 'U', desc: 'Index and middle fingers up together, side by side', img: 'signs/U.png' },
+      { name: 'V', mode: 'letters', match: 'V', desc: 'Index and middle fingers spread apart — peace sign', img: 'signs/V.png' },
+      { name: 'W', mode: 'letters', match: 'W', desc: 'Index, middle, and ring fingers spread up', img: 'signs/W.png' },
+      { name: 'X', mode: 'letters', match: 'X', desc: 'Fist with index finger hooked/bent', img: 'signs/X.png' },
+      { name: 'Y', mode: 'letters', match: 'Y', desc: 'Extend thumb and pinky, curl other fingers down', img: 'signs/Y.png' },
+      { name: 'Z', mode: 'letters', match: 'Z', desc: 'Trace a Z in the air with your index finger', img: 'signs/Z.png' },
+      // Words
+      { name: 'HELLO', mode: 'words', match: 'HELLO', desc: 'Open hand near forehead, move outward like a salute wave', dynamic: 'Start with flat hand at forehead, then move away', img: 'signs/HELLO.png' },
+      { name: 'GOODBYE', mode: 'words', match: 'GOODBYE', desc: 'Open hand, wave by folding fingers down repeatedly', dynamic: 'Open and close fingers in a waving motion', img: 'signs/GOODBYE.png' },
+      { name: 'OK', mode: 'words', match: 'OK', desc: 'Touch index finger and thumb to form a circle', dynamic: 'Hold the O-K shape steady', img: 'signs/OK.png' },
+      { name: 'THANK YOU', mode: 'words', match: 'THANK_YOU', desc: 'Flat hand starts at chin, moves forward and down', dynamic: 'Touch chin with fingertips, then move hand outward', img: 'signs/THANK_YOU.png' },
+      { name: 'I LOVE YOU', mode: 'words', match: 'I_LOVE_YOU', desc: 'Extend pinky, index finger, and thumb simultaneously', dynamic: 'Hold the ILY handshape steady — like a rock sign with thumb out', img: 'signs/I_LOVE_YOU.png' },
+      { name: 'SIGMA', mode: 'words', match: 'SIGMA', desc: 'Perform the sigma sign', dynamic: 'Hold steady for detection', img: 'signs/SIGMA.png' },
+      { name: 'BADDIE', mode: 'words', match: 'BADDIE', desc: 'Perform the baddie sign', dynamic: 'Hold steady for detection', img: 'signs/BADDIE.png' },
+      { name: 'RIZZ', mode: 'words', match: 'RIZZ', desc: 'Perform the rizz sign', dynamic: 'Hold steady for detection', img: 'signs/RIZZ.png' },
+      { name: '6-7', mode: 'words', match: '6_7', desc: 'Show six then transition to seven', dynamic: 'Start with 6 hand shape, transition to 7', img: 'signs/6_7.png' },
+    ];
+
+    let tutorialIndex = 0;
+    let tutorialCorrect = false;
+    let tutorialAdvanceTimer = null;
+
+    function initTutorial() {
+      // Load progress from localStorage
+      const saved = localStorage.getItem('asl-tutorial-index');
+      if (saved !== null) tutorialIndex = Math.min(parseInt(saved), TUTORIAL_SIGNS.length);
+      renderTutorial();
+    }
+
+    function renderTutorial() {
+      const container = document.getElementById('tutorialCardContainer');
+      const progressFill = document.getElementById('tutorialProgressFill');
+      const progressText = document.getElementById('tutorialProgressText');
+
+      const total = TUTORIAL_SIGNS.length;
+      const pct = (tutorialIndex / total) * 100;
+      progressFill.style.width = pct + '%';
+      progressText.textContent = tutorialIndex + '/' + total;
+
+      // Completed all signs
+      if (tutorialIndex >= total) {
+        container.innerHTML = `
+          <div class="tutorial-complete">
+            <div class="complete-title">Tutorial Complete!</div>
+            <div class="complete-sub">You've learned all ${total} signs.<br>Try Freestyle or Challenge mode!</div>
+            <button class="cam-btn" onclick="resetTutorial()">Restart</button>
+          </div>
+        `;
+        return;
+      }
+
+      const sign = TUTORIAL_SIGNS[tutorialIndex];
+      tutorialCorrect = false;
+
+      container.innerHTML = `
+        <div class="tutorial-card" id="tutorialCard">
+          <div class="tutorial-sign-name">${sign.name}</div>
+          <div class="tutorial-image">
+            <img src="${sign.img}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="${sign.name}">
+            <div class="placeholder-letter" style="display:none">${sign.name.charAt(0)}</div>
+          </div>
+          <div class="tutorial-desc">${sign.desc}</div>
+          ${sign.dynamic ? `<div class="tutorial-dynamic">${sign.dynamic}</div>` : ''}
+          <div class="tutorial-status waiting" id="tutorialStatus">Show this sign to the camera...</div>
+          <div class="tutorial-actions">
+            <button class="skip-btn" onclick="skipTutorialSign()">Skip</button>
+          </div>
+        </div>
+      `;
+
+      updateTutorialMode();
+    }
+
+    function updateTutorialMode() {
+      if (tutorialIndex >= TUTORIAL_SIGNS.length) return;
+      const sign = TUTORIAL_SIGNS[tutorialIndex];
+      if (aslSocket && aslSocket.readyState === WebSocket.OPEN) {
+        aslSocket.send(JSON.stringify({ action: 'set_mode', mode: sign.mode }));
+      }
+    }
+
+    function checkTutorialDetection(msg) {
+      if (activeTab !== 'tutorial') return;
+      if (tutorialCorrect) return;
+      if (tutorialIndex >= TUTORIAL_SIGNS.length) return;
+
+      const sign = TUTORIAL_SIGNS[tutorialIndex];
+
+      if (msg.type === 'detection') {
+        let detected = '';
+        if (msg.kind === 'letter') detected = msg.value;
+        else if (msg.kind === 'word') detected = msg.word || msg.value;
+
+        if (detected === sign.match) {
+          tutorialCorrect = true;
+          const card = document.getElementById('tutorialCard');
+          const status = document.getElementById('tutorialStatus');
+          if (card) card.classList.add('correct');
+          if (status) {
+            status.className = 'tutorial-status correct';
+            status.textContent = 'Correct!';
+          }
+          // Auto-advance after 1.5s
+          tutorialAdvanceTimer = setTimeout(() => advanceTutorial(), 1500);
+        }
+      }
+    }
+
+    function advanceTutorial() {
+      if (tutorialAdvanceTimer) { clearTimeout(tutorialAdvanceTimer); tutorialAdvanceTimer = null; }
+      tutorialIndex++;
+      localStorage.setItem('asl-tutorial-index', tutorialIndex);
+      renderTutorial();
+    }
+
+    function skipTutorialSign() {
+      if (tutorialAdvanceTimer) { clearTimeout(tutorialAdvanceTimer); tutorialAdvanceTimer = null; }
+      tutorialIndex++;
+      localStorage.setItem('asl-tutorial-index', tutorialIndex);
+      renderTutorial();
+    }
+
+    function resetTutorial() {
+      tutorialIndex = 0;
+      localStorage.setItem('asl-tutorial-index', 0);
+      renderTutorial();
+    }
+
+    // Initialize tutorial on page load
+    initTutorial();
 
     // ============================================================
     // STREAMING BEAT ENGINE (WebSocket + Web Audio API)

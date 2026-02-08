@@ -15,6 +15,8 @@ load_dotenv()
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 # ── Beat generation (optional — needs google-genai + GEMINI_API_KEY) ──
 client = None
@@ -38,10 +40,17 @@ try:
 except ImportError:
     print("  Beat generation: disabled (google-genai not installed)")
 
-# ── ASL detector imports ───────────────────────────────────────
+# ── ASL detector imports (optional) ───────────────────────────────────────
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "asl-detector"))
 
-from asl_handler import ASLDetectionSession
+try:
+    from asl_handler import ASLDetectionSession
+    ASL_AVAILABLE = True
+    print("  ASL detection: enabled")
+except ImportError as e:
+    print(f"  ASL detection: disabled ({e})")
+    ASLDetectionSession = None
+    ASL_AVAILABLE = False
 
 # ── ASL model globals (loaded on startup) ──────────────────────
 static_model = None
@@ -63,6 +72,10 @@ app.add_middleware(
 async def load_asl_models():
     """Load ASL models once at server startup."""
     global static_model, lstm_model
+
+    if not ASL_AVAILABLE:
+        print("  ASL: Skipping model loading (dependencies not available)")
+        return
 
     asl_dir = os.path.join(os.path.dirname(__file__), "..", "asl-detector")
     static_path = os.path.join(asl_dir, "asl_model.keras")
@@ -105,14 +118,21 @@ async def load_asl_models():
         print(f"  ASL: LSTM model not found at {lstm_path}")
 
 
+# ── Serve Frontend ─────────────────────────────────────────
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
+
 @app.get("/")
 async def root():
-    return {"status": "SignCraft Beat Generator is running"}
-
+    """Serve the main frontend page."""
+    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
+
+@app.get("/api/status")
+async def status():
+    return {"status": "SignCraft is running"}
 
 
 @app.websocket("/ws/beat")
@@ -282,6 +302,11 @@ async def asl_detect(ws: WebSocket):
     """
     await ws.accept()
 
+    if not ASL_AVAILABLE:
+        await ws.send_text(json.dumps({"type": "error", "message": "ASL detection not available"}))
+        await ws.close()
+        return
+
     session = ASLDetectionSession(static_model, lstm_model)
 
     try:
@@ -345,3 +370,8 @@ async def asl_detect(ws: WebSocket):
             pass
     finally:
         session.cleanup()
+
+
+# ── Mount static files LAST (catch-all for frontend assets) ──────────
+app.mount("/signs", StaticFiles(directory=os.path.join(FRONTEND_DIR, "signs")), name="signs")
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

@@ -1513,7 +1513,8 @@
     // ============================================================
     // HASH-BASED VIBE COLORS — unique color per prompt, instant
     // ============================================================
-    const API_BASE = 'http://localhost:8000';
+    // Use same origin - works locally and when deployed
+    const API_BASE = window.location.origin;
 
     const DEFAULT_DARK  = { accent: '#4ade80', dim: 'rgba(74,222,128,0.12)', glow: 'rgba(74,222,128,0.35)' };
     const DEFAULT_LIGHT = { accent: '#4a7a64', dim: 'rgba(74,122,100,0.1)', glow: 'rgba(74,122,100,0.2)' };
@@ -1683,7 +1684,8 @@
       const video = document.getElementById('webcamVideo');
       if (!video.srcObject) return;
 
-      aslSocket = new WebSocket('ws://localhost:8000/ws/asl');
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      aslSocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/asl`);
 
       aslSocket.onopen = () => {
         isDetecting = true;
@@ -1740,7 +1742,7 @@
         data: dataUrl,
       }));
 
-      frameLoopTimer = setTimeout(sendFrameLoop, 66); // ~15fps
+      frameLoopTimer = setTimeout(sendFrameLoop, 150); // ~7fps - optimized for free tier servers
     }
 
     const HAND_CONNECTIONS = [
@@ -2020,7 +2022,7 @@
     // ============================================================
     // STREAMING BEAT ENGINE (WebSocket + Web Audio API)
     // ============================================================
-    const WS_URL = 'ws://localhost:8000/ws/beat';
+    const WS_URL = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/ws/beat';
     let beatSocket = null;
     let audioCtx = null;
     let scriptNode = null;

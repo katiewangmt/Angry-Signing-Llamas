@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Angry Silent Lamas [ASL]</title>
+  <title>Angry Signing Llama [ASL]</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     [data-theme="dark"] {
@@ -95,23 +95,28 @@
 
     .logo {
       font-family: 'Press Start 2P', cursive;
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text-primary);
       transition: color 0.6s;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 0;
     }
 
+    .logo .word { margin-right: 16px; }
+    .logo .word:last-of-type { margin-right: 0; }
+
     .logo-img {
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       object-fit: contain;
       image-rendering: pixelated;
+      margin-left: 18px;
     }
 
     .logo .big {
-      font-size: 30px;
+      font-size: 42px;
+      line-height: 1;
       color: var(--accent);
       text-shadow: 3px 3px 0px var(--accent-dim);
       transition: color 0.6s, text-shadow 0.6s;
@@ -541,6 +546,7 @@
       gap: 16px;
       padding: 30px 20px;
       text-align: center;
+      margin-top: 24px;
     }
 
     .tutorial-complete .big-emoji {
@@ -944,7 +950,7 @@
 
     <!-- HEADER -->
     <header class="header fade-in">
-      <div class="logo"><img src="angrylama.webp" class="logo-img" alt=""><span class="big">A</span>ngry <span class="big">S</span>ilent <span class="big">L</span>amas</div>
+      <div class="logo"><span class="word"><span class="big">A</span>ngry</span><span class="word"><span class="big">S</span>igning</span><span class="word"><span class="big">L</span>lama</span><img src="angrylama.webp" class="logo-img" alt=""></div>
       <div class="header-side">
         <div class="theme-toggle" onclick="toggleTheme()">
           <span class="toggle-icon">🌙</span>
@@ -1067,7 +1073,7 @@
       </div>
     </div>
 
-    <div class="footer fade-in">Angry Silent Lamas v1.0 — built at ADI 2026</div>
+    <div class="footer fade-in">Angry Signing Llama v1.0 — built at ADI 2026</div>
   </div>
 
   <script>
@@ -1436,8 +1442,8 @@
       { name: 'M', mode: 'letters', match: 'M', desc: 'Fist with thumb tucked under three fingers', img: 'signs/M.png' },
       { name: 'N', mode: 'letters', match: 'N', desc: 'Fist with thumb tucked under two fingers', img: 'signs/N.png' },
       { name: 'O', mode: 'letters', match: 'O', desc: 'All fingertips touch thumb forming an O', img: 'signs/O.png' },
-      { name: 'P', mode: 'letters', match: 'P', desc: 'Like K but pointing downward', img: 'signs/P.png' },
-      { name: 'Q', mode: 'letters', match: 'Q', desc: 'Like G but pointing downward', img: 'signs/Q.png' },
+      { name: 'P', mode: 'letters', match: 'P', desc: 'Index and middle finger pointing down, thumb sticking out between them', img: 'signs/P.png' },
+      { name: 'Q', mode: 'letters', match: 'Q', desc: 'Thumb and index finger pointing downward together, other fingers curled in', img: 'signs/Q.png' },
       { name: 'R', mode: 'letters', match: 'R', desc: 'Cross your index and middle fingers', img: 'signs/R.png' },
       { name: 'S', mode: 'letters', match: 'S', desc: 'Fist with thumb over the front of fingers', img: 'signs/S.png' },
       { name: 'T', mode: 'letters', match: 'T', desc: 'Fist with thumb tucked between index and middle finger', img: 'signs/T.png' },
@@ -1448,15 +1454,15 @@
       { name: 'Y', mode: 'letters', match: 'Y', desc: 'Extend thumb and pinky, curl other fingers down', img: 'signs/Y.png' },
       { name: 'Z', mode: 'letters', match: 'Z', desc: 'Trace a Z in the air with your index finger', img: 'signs/Z.png' },
       // Words
-      { name: 'HELLO', mode: 'words', match: 'HELLO', desc: 'Open hand near forehead, move outward like a salute wave', dynamic: 'Start with flat hand at forehead, then move away', img: 'signs/HELLO.png' },
-      { name: 'GOODBYE', mode: 'words', match: 'GOODBYE', desc: 'Open hand, wave by folding fingers down repeatedly', dynamic: 'Open and close fingers in a waving motion', img: 'signs/GOODBYE.png' },
-      { name: 'OK', mode: 'words', match: 'OK', desc: 'Touch index finger and thumb to form a circle', dynamic: 'Hold the O-K shape steady', img: 'signs/OK.png' },
-      { name: 'THANK YOU', mode: 'words', match: 'THANK_YOU', desc: 'Flat hand starts at chin, moves forward and down', dynamic: 'Touch chin with fingertips, then move hand outward', img: 'signs/THANK_YOU.png' },
-      { name: 'I LOVE YOU', mode: 'words', match: 'I_LOVE_YOU', desc: 'Extend pinky, index finger, and thumb simultaneously', dynamic: 'Hold the ILY handshape steady — like a rock sign with thumb out', img: 'signs/I_LOVE_YOU.png' },
-      { name: 'SIGMA', mode: 'words', match: 'SIGMA', desc: 'Perform the sigma sign', dynamic: 'Hold steady for detection', img: 'signs/SIGMA.png' },
-      { name: 'BADDIE', mode: 'words', match: 'BADDIE', desc: 'Perform the baddie sign', dynamic: 'Hold steady for detection', img: 'signs/BADDIE.png' },
-      { name: 'RIZZ', mode: 'words', match: 'RIZZ', desc: 'Perform the rizz sign', dynamic: 'Hold steady for detection', img: 'signs/RIZZ.png' },
-      { name: '6-7', mode: 'words', match: '6_7', desc: 'Show six then transition to seven', dynamic: 'Start with 6 hand shape, transition to 7', img: 'signs/6_7.png' },
+      { name: 'HELLO', mode: 'words', match: 'HELLO', desc: 'Flat hand at forehead, move outward like a salute wave', img: 'signs/HELLO.png' },
+      { name: 'GOODBYE', mode: 'words', match: 'GOODBYE', desc: 'Open hand, wave by folding fingers down repeatedly', img: 'signs/GOODBYE.png' },
+      { name: 'OK', mode: 'words', match: 'OK', desc: 'Touch index finger and thumb to form a circle', img: 'signs/OK.png' },
+      { name: 'THANK YOU', mode: 'words', match: 'THANK_YOU', desc: 'Touch chin with fingertips, then move hand outward and down', img: 'signs/THANK_YOU.png' },
+      { name: 'I LOVE YOU', mode: 'words', match: 'I_LOVE_YOU', desc: 'Extend pinky, index finger, and thumb — like a rock sign with thumb out', img: 'signs/I_LOVE_YOU.png' },
+      { name: 'SIGMA', mode: 'words', match: 'SIGMA', desc: 'S sign on one hand moving up while the other hand points downwards', img: 'signs/SIGMA.png' },
+      { name: 'BADDIE', mode: 'words', match: 'BADDIE', desc: 'Quiet coyote to the side of the jaw', img: 'signs/BADDIE.png' },
+      { name: 'RIZZ', mode: 'words', match: 'RIZZ', desc: 'R sign moving from the side of the jaw towards the front', img: 'signs/RIZZ.png' },
+      { name: '6-7', mode: 'words', match: '6_7', desc: 'Alternate raising and lowering your right and left hand quickly', img: 'signs/6_7.png' },
     ];
 
     let tutorialIndex = 0;
@@ -1484,9 +1490,10 @@
       if (tutorialIndex >= total) {
         container.innerHTML = `
           <div class="tutorial-complete">
+            <img src="happyllama.webp" style="width:120px;height:120px;object-fit:contain;image-rendering:pixelated;" alt="">
             <div class="complete-title">Tutorial Complete!</div>
             <div class="complete-sub">You've learned all ${total} signs.<br>Try Freestyle or Challenge mode!</div>
-            <button class="cam-btn" onclick="resetTutorial()">Restart</button>
+            <button class="cam-btn" style="margin-top:20px;" onclick="resetTutorial()">Restart Tutorial</button>
           </div>
         `;
         return;
@@ -1506,6 +1513,7 @@
           ${sign.dynamic ? `<div class="tutorial-dynamic">${sign.dynamic}</div>` : ''}
           <div class="tutorial-status waiting" id="tutorialStatus">Show this sign to the camera...</div>
           <div class="tutorial-actions">
+            <button class="skip-btn" onclick="resetTutorial()">Reset</button>
             <button class="skip-btn" onclick="skipTutorialSign()">Skip</button>
           </div>
         </div>

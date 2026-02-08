@@ -31,9 +31,9 @@ PREDICTION_INTERVAL = 2
 
 WORD_TO_LETTER = {
     "THANK_YOU": "T",
-    "OK": "O",
+    "OK": "SPACE",  # OK sign triggers space
     "HELLO": "H",
-    "GOODBYE": "G",
+    "GOODBYE": "DELETE",  # GOODBYE sign triggers delete
     "I_LOVE_YOU": "I",
     "6_7": "6",
 }
@@ -224,15 +224,37 @@ class ASLDetectionSession:
             if accepted is not None:
                 word_name = SEQUENCE_LABELS[accepted]
                 display = WORD_TO_LETTER.get(word_name, word_name)
-                results_out.append(
-                    {
-                        "type": "detection",
-                        "kind": "word",
-                        "value": display,
-                        "word": word_name,
-                        "confidence": round(conf, 3),
-                    }
-                )
+                # Send special values for DELETE and SPACE
+                if display == "DELETE":
+                    results_out.append(
+                        {
+                            "type": "detection",
+                            "kind": "word",
+                            "value": "DELETE",
+                            "word": "DELETE",
+                            "confidence": round(conf, 3),
+                        }
+                    )
+                elif display == "SPACE":
+                    results_out.append(
+                        {
+                            "type": "detection",
+                            "kind": "word",
+                            "value": "SPACE",
+                            "word": "SPACE",
+                            "confidence": round(conf, 3),
+                        }
+                    )
+                else:
+                    results_out.append(
+                        {
+                            "type": "detection",
+                            "kind": "word",
+                            "value": display,
+                            "word": word_name,
+                            "confidence": round(conf, 3),
+                        }
+                    )
 
         return results_out
 

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Angry Signing Llama [ASL]</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Mono:wght@300;400;500&family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     [data-theme="dark"] {
       --bg-primary: #1a1a2e;
@@ -44,11 +44,25 @@
     html, body { transition: background 0.4s ease, color 0.4s ease; }
 
     body {
-      font-family: 'DM Mono', monospace;
+      font-family: 'Comfortaa', cursive;
       background: var(--bg-primary);
       color: var(--text-primary);
       min-height: 100vh;
       overflow-x: hidden;
+    }
+
+    /* Rounded font for all text - Comfortaa */
+    body, p, div, span, input, textarea, select, 
+    .tutorial-desc, .tutorial-dynamic, .beat-subtitle, .recent-beat-vibe,
+    .challenge-result-sub, .challenge-info, .stat-value, .leaderboard-date,
+    .no-stats, .no-leaderboard, .no-recent, .complete-sub,
+    button, .tab-btn, .cam-btn, .diff-btn, .mode-btn, .section-label,
+    .logo, .tutorial-sign-name, .detected-text, .score-label, .score-value,
+    .challenge-result-title, .progress-text, .beat-title, .recent-beat-name,
+    .recent-beat-number, .stats-section-title, .stat-label, .leaderboard-rank,
+    .leaderboard-score, .tutorial-status, .skip-btn, .generate-btn, 
+    .vibe-tag, .overlay-tag, .footer, .complete-title {
+      font-family: 'Comfortaa', cursive !important;
     }
 
     body::before {
@@ -75,7 +89,7 @@
       height: 100vh;
       max-width: 1400px;
       margin: 0 auto;
-      padding: 24px 32px;
+      padding: 18px 24px;
       gap: 20px;
     }
 
@@ -84,18 +98,20 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-bottom: 18px;
+      padding-bottom: 24px;
       border-bottom: 3px solid var(--border);
       flex-shrink: 0;
     }
 
     .header-side {
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
     }
 
     .logo {
-      font-family: 'Press Start 2P', cursive;
-      font-size: 14px;
+      font-family: 'Comfortaa', cursive;
+      font-size: 18px;
       color: var(--text-primary);
       transition: color 0.6s;
       display: flex;
@@ -103,7 +119,7 @@
       gap: 0;
     }
 
-    .logo .word { margin-right: 16px; }
+    .logo .word { margin-right: 6px; }
     .logo .word:last-of-type { margin-right: 0; }
 
     .logo-img {
@@ -115,7 +131,7 @@
     }
 
     .logo .big {
-      font-size: 42px;
+      font-size: 52px;
       line-height: 1;
       color: var(--accent);
       text-shadow: 3px 3px 0px var(--accent-dim);
@@ -125,9 +141,11 @@
     .theme-toggle {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 10px;
       cursor: pointer;
       user-select: none;
+      height: 100%;
     }
 
     .toggle-track {
@@ -137,7 +155,7 @@
       border-radius: 16px;
       position: relative;
       transition: background 0.3s;
-      border: 2px solid var(--border);
+      border: 4px solid var(--border);
     }
 
     .toggle-knob {
@@ -146,12 +164,13 @@
       background: var(--toggle-knob);
       border-radius: 50%;
       position: absolute;
-      top: 2px;
-      left: 2px;
+      top: 50%;
+      left: 4px;
+      transform: translateY(-50%);
       transition: transform 0.3s ease, background 0.3s;
     }
 
-    [data-theme="light"] .toggle-knob { transform: translateX(26px); }
+    [data-theme="light"] .toggle-knob { transform: translateY(-50%) translateX(26px); }
     .toggle-icon { font-size: 18px; }
 
     /* === MAIN SPLIT === */
@@ -173,7 +192,7 @@
 
     .section-label {
       font-family: 'Press Start 2P', cursive;
-      font-size: 12px;
+      font-size: 15px;
       text-transform: uppercase;
       letter-spacing: 2px;
       color: var(--text-primary);
@@ -185,7 +204,7 @@
       position: relative;
       flex: 1;
       background: var(--webcam-bg);
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       overflow: hidden;
       display: flex;
@@ -215,7 +234,7 @@
 
     .webcam-placeholder p {
       font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
+      font-size: 13px;
       line-height: 1.6;
       text-align: center;
     }
@@ -229,12 +248,12 @@
     }
 
     .overlay-tag {
-      padding: 6px 12px;
+      padding: 5px 10px;
       background: rgba(0, 0, 0, 0.7);
-      border: 2px solid var(--accent);
+      border: 3px solid var(--accent);
       border-radius: 2px;
       font-family: 'Press Start 2P', cursive;
-      font-size: 8px;
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 1px;
       color: var(--accent);
@@ -254,19 +273,19 @@
       opacity: 0.6;
       transition: border-color 0.6s;
     }
-    .corner-deco.tl { top: 6px; left: 6px; border-width: 3px 0 0 3px; }
-    .corner-deco.tr { top: 6px; right: 6px; border-width: 3px 3px 0 0; }
-    .corner-deco.bl { bottom: 6px; left: 6px; border-width: 0 0 3px 3px; }
-    .corner-deco.br { bottom: 6px; right: 6px; border-width: 0 3px 3px 0; }
+    .corner-deco.tl { top: 6px; left: 6px; border-width: 4px 0 0 4px; }
+    .corner-deco.tr { top: 6px; right: 6px; border-width: 4px 4px 0 0; }
+    .corner-deco.bl { bottom: 6px; left: 6px; border-width: 0 0 4px 4px; }
+    .corner-deco.br { bottom: 6px; right: 6px; border-width: 0 4px 4px 0; }
 
     .cam-btn {
-      padding: 12px 22px;
+      padding: 10px 18px;
       background: var(--accent);
       color: var(--bg-primary);
-      border: 3px solid transparent;
+      border: 4px solid transparent;
       border-radius: 2px;
       font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
+      font-size: 13px;
       cursor: pointer;
       text-transform: uppercase;
       transition: all 0.2s, background 0.6s;
@@ -315,9 +334,9 @@
     .detected-output {
       display: flex;
       align-items: center;
-      padding: 20px 24px;
+      padding: 16px 20px;
       background: var(--bg-card);
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       min-height: 64px;
       box-shadow: 4px 4px 0px var(--shadow);
@@ -326,11 +345,11 @@
 
     .detected-text {
       font-family: 'Press Start 2P', cursive;
-      font-size: 24px;
+      font-size: 30px;
       color: var(--text-primary);
       letter-spacing: 4px;
       flex: 1;
-      min-height: 24px;
+      min-height: 30px;
       word-break: break-all;
       transition: color 0.4s;
     }
@@ -354,7 +373,7 @@
     .tab-nav {
       display: flex;
       gap: 0;
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       overflow: hidden;
       box-shadow: 3px 3px 0px var(--shadow);
@@ -365,12 +384,12 @@
 
     .tab-btn {
       flex: 1;
-      padding: 14px 8px;
+      padding: 11px 6px;
       background: var(--bg-card);
       border: none;
       color: var(--text-secondary);
       font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
+      font-size: 13px;
       cursor: pointer;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -378,7 +397,7 @@
     }
 
     .tab-btn + .tab-btn {
-      border-left: 3px solid var(--border);
+      border-left: 4px solid var(--border);
     }
 
     .tab-btn.active {
@@ -407,7 +426,7 @@
       flex: 1;
       height: 14px;
       background: var(--bg-secondary);
-      border: 2px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 2px;
       overflow: hidden;
     }
@@ -421,16 +440,16 @@
 
     .progress-text {
       font-family: 'Press Start 2P', cursive;
-      font-size: 12px;
+      font-size: 15px;
       color: var(--text-primary);
       white-space: nowrap;
     }
 
     .tutorial-card {
       background: var(--bg-card);
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
-      padding: 24px;
+      padding: 18px;
       box-shadow: 4px 4px 0px var(--shadow);
       transition: all 0.4s;
       display: flex;
@@ -446,7 +465,7 @@
 
     .tutorial-sign-name {
       font-family: 'Press Start 2P', cursive;
-      font-size: 32px;
+      font-size: 40px;
       color: var(--accent);
       text-align: center;
       transition: color 0.6s;
@@ -456,7 +475,7 @@
       width: 200px;
       height: 200px;
       background: var(--bg-secondary);
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       display: flex;
       align-items: center;
@@ -480,7 +499,7 @@
 
     .tutorial-desc {
       font-family: 'DM Mono', monospace;
-      font-size: 15px;
+      font-size: 18px;
       color: var(--text-primary);
       text-align: center;
       line-height: 1.7;
@@ -488,7 +507,7 @@
 
     .tutorial-dynamic {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: 16px;
       color: var(--accent);
       text-align: center;
       font-style: italic;
@@ -497,8 +516,8 @@
 
     .tutorial-status {
       font-family: 'Press Start 2P', cursive;
-      font-size: 12px;
-      padding: 10px 24px;
+      font-size: 15px;
+      padding: 8px 20px;
       border-radius: 2px;
       text-align: center;
       transition: all 0.3s;
@@ -511,7 +530,7 @@
     .tutorial-status.correct {
       color: var(--accent);
       background: var(--accent-dim);
-      border: 2px solid var(--accent);
+      border: 3px solid var(--accent);
     }
 
     .tutorial-actions {
@@ -522,9 +541,9 @@
 
     .tutorial-actions button {
       flex: 1;
-      padding: 14px 16px;
+      padding: 11px 13px;
       font-family: 'Press Start 2P', cursive;
-      font-size: 11px;
+      font-size: 14px;
       border-radius: 2px;
       cursor: pointer;
       text-transform: uppercase;
@@ -534,7 +553,7 @@
 
     .skip-btn {
       background: var(--bg-secondary);
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       color: var(--text-secondary);
     }
 
@@ -549,24 +568,24 @@
       flex-direction: column;
       align-items: center;
       gap: 16px;
-      padding: 30px 20px;
+      padding: 24px 16px;
       text-align: center;
       margin-top: 24px;
     }
 
     .tutorial-complete .big-emoji {
-      font-size: 48px;
+      font-size: 60px;
     }
 
     .tutorial-complete .complete-title {
       font-family: 'Press Start 2P', cursive;
-      font-size: 14px;
+      font-size: 18px;
       color: var(--accent);
     }
 
     .tutorial-complete .complete-sub {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: 16px;
       color: var(--text-secondary);
     }
 
@@ -574,7 +593,7 @@
     .mode-toggle {
       display: flex;
       gap: 0;
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       overflow: hidden;
       box-shadow: 3px 3px 0px var(--shadow);
@@ -583,12 +602,12 @@
 
     .mode-btn {
       flex: 1;
-      padding: 10px 16px;
+      padding: 8px 13px;
       background: var(--bg-card);
       border: none;
       color: var(--text-secondary);
       font-family: 'Press Start 2P', cursive;
-      font-size: 9px;
+      font-size: 12px;
       cursor: pointer;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -596,7 +615,7 @@
     }
 
     .mode-btn + .mode-btn {
-      border-left: 3px solid var(--border);
+      border-left: 4px solid var(--border);
     }
 
     .mode-btn.active {
@@ -616,7 +635,7 @@
       gap: 12px;
       padding-top: 24px;
       margin-bottom: 34px;
-      border-top: 3px solid var(--border);
+      border-top: 4px solid var(--border);
       transition: border-color 0.6s;
     }
 
@@ -628,13 +647,13 @@
 
     .beat-input {
       flex: 1;
-      padding: 14px 16px;
+      padding: 11px 13px;
       background: var(--bg-secondary);
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       color: var(--text-primary);
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: 16px;
       outline: none;
       transition: border-color 0.2s, background 0.4s, color 0.4s;
     }
@@ -642,7 +661,7 @@
     .beat-input::placeholder {
       color: var(--text-secondary);
       opacity: 0.7;
-      font-size: 13px;
+      font-size: 16px;
     }
 
     .beat-input:focus {
@@ -651,13 +670,13 @@
     }
 
     .generate-btn {
-      padding: 14px 20px;
+      padding: 11px 16px;
       background: var(--bg-card);
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       color: var(--text-primary);
       font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
+      font-size: 13px;
       cursor: pointer;
       transition: all 0.15s;
       white-space: nowrap;
@@ -681,9 +700,9 @@
       display: none;
       align-items: center;
       gap: 14px;
-      padding: 16px 20px;
+      padding: 13px 16px;
       background: var(--bg-card);
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       box-shadow: 4px 4px 0px var(--shadow);
       transition: background 0.4s, border-color 0.6s, box-shadow 0.4s;
@@ -698,7 +717,7 @@
       align-items: center;
       justify-content: center;
       background: var(--accent);
-      border: 3px solid transparent;
+      border: 4px solid transparent;
       border-radius: 4px;
       cursor: pointer;
       transition: all 0.15s, background 0.6s;
@@ -732,7 +751,7 @@
 
     .beat-title {
       font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
+      font-size: 13px;
       color: var(--text-primary);
       transition: color 0.4s;
       overflow: hidden;
@@ -741,7 +760,7 @@
     }
 
     .beat-subtitle {
-      font-size: 13px;
+      font-size: 16px;
       color: var(--text-secondary);
       transition: color 0.4s;
     }
@@ -801,7 +820,7 @@
       flex-direction: column;
       gap: 10px;
       padding-top: 24px;
-      border-top: 3px solid var(--border);
+      border-top: 4px solid var(--border);
       transition: border-color 0.6s;
     }
 
@@ -815,9 +834,9 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 12px 16px;
+      padding: 10px 13px;
       background: var(--bg-card);
-      border: 2px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       cursor: pointer;
       transition: all 0.15s;
@@ -837,7 +856,7 @@
 
     .recent-beat-number {
       font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
+      font-size: 13px;
       color: var(--accent);
       flex-shrink: 0;
       width: 22px;
@@ -851,7 +870,7 @@
 
     .recent-beat-name {
       font-family: 'Press Start 2P', cursive;
-      font-size: 9px;
+      font-size: 12px;
       color: var(--text-primary);
       overflow: hidden;
       text-overflow: ellipsis;
@@ -860,7 +879,7 @@
     }
 
     .recent-beat-vibe {
-      font-size: 12px;
+      font-size: 15px;
       color: var(--text-secondary);
       margin-top: 3px;
       transition: color 0.4s;
@@ -873,7 +892,7 @@
       align-items: center;
       justify-content: center;
       background: var(--accent-dim);
-      border: 2px solid var(--accent);
+      border: 3px solid var(--accent);
       border-radius: 4px;
       flex-shrink: 0;
       transition: all 0.6s;
@@ -888,10 +907,10 @@
 
     .no-recent {
       font-family: 'Press Start 2P', cursive;
-      font-size: 9px;
+      font-size: 12px;
       color: var(--text-secondary);
       text-align: center;
-      padding: 16px;
+      padding: 13px;
       opacity: 0.5;
     }
 
@@ -899,7 +918,7 @@
     .footer {
       text-align: left;
       font-family: 'Press Start 2P', cursive;
-      font-size: 8px;
+      font-size: 11px;
       color: var(--text-secondary);
       opacity: 0.6;
       letter-spacing: 1px;
@@ -934,7 +953,7 @@
       flex-direction: column;
       align-items: center;
       gap: 0;
-      padding: 20px 16px;
+      padding: 16px 13px;
     }
 
     .challenge-section {
@@ -943,17 +962,17 @@
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      padding: 33px 0;
+      padding: 26px 0;
     }
 
     .challenge-section + .challenge-section {
-      border-top: 2px solid var(--border);
+      border-top: 3px solid var(--border);
     }
 
     .challenge-difficulty {
       display: flex;
       gap: 0;
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       overflow: hidden;
       box-shadow: 3px 3px 0px var(--shadow);
@@ -962,19 +981,19 @@
 
     .diff-btn {
       flex: 1;
-      padding: 12px 16px;
+      padding: 10px 13px;
       background: var(--bg-card);
       border: none;
       color: var(--text-secondary);
       font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
+      font-size: 13px;
       cursor: pointer;
       text-transform: uppercase;
       transition: all 0.2s;
     }
 
     .diff-btn + .diff-btn {
-      border-left: 3px solid var(--border);
+      border-left: 4px solid var(--border);
     }
 
     .diff-btn.active {
@@ -995,9 +1014,9 @@
 
     .score-box {
       flex: 1;
-      padding: 12px 10px;
+      padding: 10px 8px;
       background: var(--bg-card);
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       text-align: center;
       box-shadow: 3px 3px 0px var(--shadow);
@@ -1008,7 +1027,7 @@
 
     .score-label {
       font-family: 'Press Start 2P', cursive;
-      font-size: 8px;
+      font-size: 11px;
       color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -1017,7 +1036,7 @@
 
     .score-value {
       font-family: 'Press Start 2P', cursive;
-      font-size: 28px;
+      font-size: 35px;
     }
 
     .score-value.correct-val { color: var(--accent); }
@@ -1025,7 +1044,7 @@
 
     .challenge-info {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: 16px;
       color: var(--text-secondary);
       text-align: center;
       line-height: 1.6;
@@ -1036,17 +1055,17 @@
       flex-direction: column;
       align-items: center;
       gap: 24px;
-      padding: 30px 16px;
+      padding: 24px 13px;
     }
 
     .challenge-result-title {
       font-family: 'Press Start 2P', cursive;
-      font-size: 16px;
+      font-size: 20px;
     }
 
     .challenge-result-sub {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: 16px;
       color: var(--text-secondary);
       text-align: center;
     }
@@ -1077,7 +1096,7 @@
     .scroll-letter {
       position: absolute;
       font-family: 'Press Start 2P', cursive;
-      font-size: 22px;
+      font-size: 28px;
       top: 50%;
       transform: translateY(-50%);
       transition: color 0.2s;
@@ -1105,7 +1124,7 @@
       display: flex;
       flex-direction: column;
       gap: 0;
-      padding: 20px 16px;
+      padding: 16px 13px;
     }
 
     .stats-section {
@@ -1116,7 +1135,7 @@
 
     .stats-section-title {
       font-family: 'Press Start 2P', cursive;
-      font-size: 11px;
+      font-size: 14px;
       color: var(--text-primary);
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -1136,9 +1155,9 @@
     .stats-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
     .stat-item {
-      padding: 10px 8px;
+      padding: 8px 6px;
       background: var(--bg-card);
-      border: 2px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       text-align: center;
       transition: all 0.2s;
@@ -1157,7 +1176,7 @@
 
     .stat-label {
       font-family: 'Press Start 2P', cursive;
-      font-size: 12px;
+      font-size: 15px;
       color: var(--text-primary);
       margin-bottom: 4px;
       word-break: break-word;
@@ -1174,16 +1193,16 @@
     }
 
     .stat-label.small {
-      font-size: 9px;
+      font-size: 12px;
     }
 
     .stat-label.tiny {
-      font-size: 7px;
+      font-size: 10px;
     }
 
     .stat-value {
       font-family: 'DM Mono', monospace;
-      font-size: 14px;
+      font-size: 18px;
       color: var(--danger);
       font-weight: 500;
       flex-shrink: 0;
@@ -1205,9 +1224,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 16px;
+      padding: 10px 13px;
       background: var(--bg-card);
-      border: 2px solid var(--border);
+      border: 4px solid var(--border);
       border-radius: 4px;
       transition: all 0.2s;
     }
@@ -1219,7 +1238,7 @@
 
     .leaderboard-rank {
       font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
+      font-size: 13px;
       color: var(--accent);
       width: 30px;
       flex-shrink: 0;
@@ -1227,7 +1246,7 @@
 
     .leaderboard-score {
       font-family: 'Press Start 2P', cursive;
-      font-size: 14px;
+      font-size: 18px;
       color: var(--text-primary);
       flex: 1;
       text-align: center;
@@ -1235,7 +1254,7 @@
 
     .leaderboard-date {
       font-family: 'DM Mono', monospace;
-      font-size: 10px;
+      font-size: 13px;
       color: var(--text-secondary);
       flex-shrink: 0;
       width: 100px;
@@ -1244,19 +1263,19 @@
 
     .no-stats {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: 16px;
       color: var(--text-secondary);
       text-align: center;
-      padding: 40px 20px;
+      padding: 32px 16px;
       opacity: 0.6;
     }
 
     .no-leaderboard {
       font-family: 'DM Mono', monospace;
-      font-size: 13px;
+      font-size: 16px;
       color: var(--text-secondary);
       text-align: center;
-      padding: 40px 20px;
+      padding: 32px 16px;
       opacity: 0.6;
     }
 
@@ -1304,7 +1323,7 @@
       <div class="left-panel">
         <div class="webcam-container" id="webcamContainer">
           <div class="webcam-placeholder" id="webcamPlaceholder">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
             </svg>
             <p>Press start camera<br>to begin signing</p>
@@ -1359,6 +1378,9 @@
             </div>
             <div class="detected-output">
               <div class="detected-text" id="detectedText"><span class="cursor"></span></div>
+            </div>
+            <div class="challenge-info" style="font-size:12px;margin-top:8px;text-align:center;">
+              <strong>Word Building:</strong> Sign letters to build words. Sign <strong>GOODBYE</strong> to delete, <strong>OK</strong> to add space and speak word.
             </div>
           </section>
 
@@ -1424,8 +1446,8 @@
                   </div>
                   <input type="range" id="challengeSpeedSlider" min="1" max="5" value="3" step="1" style="width:100%;accent-color:var(--accent);cursor:pointer;" oninput="updateSpeedLabel()">
                   <div style="display:flex;justify-content:space-between;">
-                    <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-secondary);">Slow</span>
-                    <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-secondary);">Fast</span>
+                    <span style="font-size:11px;color:var(--text-secondary);">Slow</span>
+                    <span style="font-size:11px;color:var(--text-secondary);">Fast</span>
                   </div>
                 </div>
               </div>
@@ -1507,6 +1529,7 @@
     let stream = null;
     let beatPlaying = false;
     let detectedLetters = '';
+    let currentWord = ''; // For word building in freestyle mode
     let recentBeats = []; // max 3
     let currentVibeData = null;
 
@@ -1689,8 +1712,15 @@
     }
 
     function showDetection(text) {
-      document.getElementById('detectedText').innerHTML =
-        text + '<span class="cursor"></span>';
+      if (activeTab === 'freestyle' && aslMode === 'letters') {
+        // In freestyle letters mode, show the current word being built
+        document.getElementById('detectedText').innerHTML =
+          currentWord + '<span class="cursor"></span>';
+      } else {
+        // Other modes show direct detection
+        document.getElementById('detectedText').innerHTML =
+          text + '<span class="cursor"></span>';
+      }
     }
 
     function startASLDetection() {
@@ -1807,7 +1837,7 @@
 
       // Draw connections
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 3;
       for (const [i, j] of HAND_CONNECTIONS) {
         const [x1, y1] = landmarks[i];
         const [x2, y2] = landmarks[j];
@@ -1821,11 +1851,11 @@
       const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent');
       for (const [x, y] of landmarks) {
         ctx.beginPath();
-        ctx.arc(mapX(x), mapY(y), 5, 0, Math.PI * 2);
+        ctx.arc(mapX(x), mapY(y), 6, 0, Math.PI * 2);
         ctx.fillStyle = accentColor;
         ctx.fill();
         ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.stroke();
       }
     }
@@ -1844,8 +1874,10 @@
 
       if (msg.type === 'detection') {
         if (msg.kind === 'letter') {
+          handleFreestyleLetter(msg.value);
           showDetection(msg.value);
         } else if (msg.kind === 'word') {
+          handleFreestyleWord(msg.word || msg.value);
           showDetection(msg.word || msg.value);
         }
         // Check tutorial match
@@ -1862,9 +1894,109 @@
       document.getElementById('modeBtnLetters').classList.toggle('active', mode === 'letters');
       document.getElementById('modeBtnWords').classList.toggle('active', mode === 'words');
 
+      // Reset word building when switching modes
+      if (mode === 'letters') {
+        currentWord = '';
+        showDetection('');
+      }
+
       // Tell backend
       if (aslSocket && aslSocket.readyState === WebSocket.OPEN) {
         aslSocket.send(JSON.stringify({ action: 'set_mode', mode: mode }));
+      }
+    }
+
+    // ============================================================
+    // FREESTYLE WORD BUILDING & TEXT-TO-SPEECH
+    // ============================================================
+    function handleFreestyleLetter(letter) {
+      if (activeTab !== 'freestyle' || aslMode !== 'letters') return;
+      
+      // Special handling for DELETE and SPACE
+      if (letter === 'DELETE' || letter === 'DEL' || letter === 'X') {
+        // X or DELETE - remove last character
+        currentWord = currentWord.slice(0, -1);
+        showDetection('');
+        return;
+      }
+      
+      if (letter === 'SPACE' || letter === ' ') {
+        // Space detected - speak the word
+        if (currentWord.trim()) {
+          speakWord(currentWord.trim());
+          currentWord = '';
+          showDetection('');
+        }
+        return;
+      }
+      
+      // Regular letter - add to word
+      if (letter && letter.length === 1 && /[A-Z]/.test(letter)) {
+        currentWord += letter;
+        showDetection('');
+      }
+    }
+
+    function handleFreestyleWord(word) {
+      if (activeTab !== 'freestyle' || aslMode !== 'words') return;
+      
+      // Handle special words - DELETE and SPACE come from backend mapping
+      const upperWord = (word || '').toUpperCase();
+      if (upperWord === 'DELETE' || upperWord === 'DEL') {
+        // DELETE gesture (mapped from GOODBYE in backend)
+        currentWord = currentWord.slice(0, -1);
+        showDetection('');
+        return;
+      }
+      
+      if (upperWord === 'SPACE' || upperWord === ' ') {
+        // SPACE gesture (mapped from OK in backend) - speak the word
+        if (currentWord.trim()) {
+          speakWord(currentWord.trim());
+          currentWord = '';
+          showDetection('');
+        }
+        return;
+      }
+      
+      // Regular word - add to current word
+      if (word && word !== 'DELETE' && word !== 'SPACE') {
+        currentWord += word + ' ';
+        showDetection('');
+      }
+    }
+
+    async function speakWord(word) {
+      if (!word || !word.trim()) return;
+      
+      try {
+        const backendUrl = window.location.port === '3000' 
+          ? 'http://localhost:8000' 
+          : window.location.origin;
+        
+        const response = await fetch(`${backendUrl}/api/tts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: word }),
+        });
+        
+        if (response.ok) {
+          const audioBlob = await response.blob();
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audio = new Audio(audioUrl);
+          audio.play().catch(err => console.error('Error playing audio:', err));
+          
+          // Clean up URL after playing
+          audio.onended = () => {
+            URL.revokeObjectURL(audioUrl);
+          };
+        } else {
+          console.error('TTS error:', response.status, await response.text());
+        }
+      } catch (error) {
+        console.error('Error calling TTS:', error);
       }
     }
 

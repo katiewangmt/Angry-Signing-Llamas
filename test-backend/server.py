@@ -16,7 +16,13 @@ load_dotenv()
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
+from pydantic import BaseModel
+try:
+    import httpx
+    HTTPX_AVAILABLE = True
+except ImportError:
+    HTTPX_AVAILABLE = False
 
 # ── Beat generation (optional — needs google-genai + GEMINI_API_KEY) ──
 client = None
@@ -370,6 +376,69 @@ async def asl_detect(ws: WebSocket):
             pass
     finally:
         session.cleanup()
+
+
+# ── Text-to-Speech (ElevenLabs) ───────────────────────────────────────
+ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "0bbe00bc30909760c07ccaf8a4b5391e134f9a4972761478782f92a6f20fba5d")
+ELEVENLABS_BASE_URL = "https://api.elevenlabs.io/v1"
+
+class TTSRequest(BaseModel):
+    text: str
+
+@app.post("/api/tts")
+async def text_to_speech(request: TTSRequest):
+    """
+    Convert text to speech using ElevenLabs API.
+    Returns audio as MP3.
+    """
+    if not HTTPX_AVAILABLE:
+        return Response(content="httpx not available", status_code=503)
+    
+    text = request.text
+    if not text or not text.strip():
+        return Response(content="No text provided", status_code=400)
+    
+    try:
+        voice_id = "pNInz6obpgDQGcFmaJgB"  # Adam voice
+        
+        url = f"{ELEVENLABS_BASE_URL}/text-to-speech/{voice_id}"
+        
+        payload = {
+            "text": text,
+            "model_id": "eleven_turbo_v2_5",
+            "voice_settings": {
+                "stability": 0.4,
+                "similarity_boost": 0.75,
+                "style": 0.85,
+                "use_speaker_boost": True
+            }
+        }
+        
+        headers = {
+            "Accept": "audio/mpeg",
+            "Content-Type": "application/json",
+            "xi-api-key": ELEVENLABS_API_KEY
+        }
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(url, json=payload, headers=headers)
+            
+            if response.status_code == 200:
+                return Response(
+                    content=response.content,
+                    media_type="audio/mpeg",
+                    headers={"Content-Disposition": f'inline; filename="speech.mp3"'}
+                )
+            else:
+                return Response(
+                    content=f"ElevenLabs API error: {response.status_code}",
+                    status_code=response.status_code
+                )
+    except Exception as e:
+        return Response(
+            content=f"Error generating speech: {str(e)}",
+            status_code=500
+        )
 
 
 # ── Mount static files LAST (catch-all for frontend assets) ──────────

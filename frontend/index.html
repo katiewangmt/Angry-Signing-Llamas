@@ -464,10 +464,11 @@
       overflow: hidden;
     }
 
-    .tutorial-image img {
+    .tutorial-image img,
+    .tutorial-image video {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
     }
 
     .tutorial-image .placeholder-letter {
@@ -1431,42 +1432,42 @@
     // ============================================================
     const TUTORIAL_SIGNS = [
       // Letters A-Z
-      { name: 'A', mode: 'letters', match: 'A', desc: 'Make a fist with your thumb resting on the side', img: 'signs/A.png' },
-      { name: 'B', mode: 'letters', match: 'B', desc: 'Flat hand, fingers together pointing up, thumb tucked across palm', img: 'signs/B.png' },
-      { name: 'C', mode: 'letters', match: 'C', desc: 'Curve your hand into a C shape', img: 'signs/C.png' },
-      { name: 'D', mode: 'letters', match: 'D', desc: 'Index finger up, other fingers curl down to touch thumb', img: 'signs/D.png' },
-      { name: 'E', mode: 'letters', match: 'E', desc: 'Curl all fingers down, thumb tucked under fingers', img: 'signs/E.png' },
-      { name: 'F', mode: 'letters', match: 'F', desc: 'Index and thumb form a circle, other 3 fingers spread up', img: 'signs/F.png' },
-      { name: 'G', mode: 'letters', match: 'G', desc: 'Index finger and thumb pointing sideways, parallel', img: 'signs/G.png' },
-      { name: 'H', mode: 'letters', match: 'H', desc: 'Index and middle fingers extended sideways together', img: 'signs/H.png' },
-      { name: 'I', mode: 'letters', match: 'I', desc: 'Make a fist with only your pinky raised', img: 'signs/I.png' },
-      { name: 'J', mode: 'letters', match: 'J', desc: 'Start with pinky up, trace a J shape downward', img: 'signs/J.png' },
-      { name: 'K', mode: 'letters', match: 'K', desc: 'Index and middle finger up in a V, thumb between them', img: 'signs/K.png' },
-      { name: 'L', mode: 'letters', match: 'L', desc: 'L shape — index finger up, thumb out to the side', img: 'signs/L.png' },
-      { name: 'M', mode: 'letters', match: 'M', desc: 'Fist with thumb tucked under three fingers', img: 'signs/M.png' },
-      { name: 'N', mode: 'letters', match: 'N', desc: 'Fist with thumb tucked under two fingers', img: 'signs/N.png' },
-      { name: 'O', mode: 'letters', match: 'O', desc: 'All fingertips touch thumb forming an O', img: 'signs/O.png' },
-      { name: 'P', mode: 'letters', match: 'P', desc: 'Index and middle finger pointing down, thumb sticking out between them', img: 'signs/P.png' },
-      { name: 'Q', mode: 'letters', match: 'Q', desc: 'Thumb and index finger pointing downward together, other fingers curled in', img: 'signs/Q.png' },
-      { name: 'R', mode: 'letters', match: 'R', desc: 'Cross your index and middle fingers', img: 'signs/R.png' },
-      { name: 'S', mode: 'letters', match: 'S', desc: 'Fist with thumb over the front of fingers', img: 'signs/S.png' },
-      { name: 'T', mode: 'letters', match: 'T', desc: 'Fist with thumb tucked between index and middle finger', img: 'signs/T.png' },
-      { name: 'U', mode: 'letters', match: 'U', desc: 'Index and middle fingers up together, side by side', img: 'signs/U.png' },
-      { name: 'V', mode: 'letters', match: 'V', desc: 'Index and middle fingers spread apart — peace sign', img: 'signs/V.png' },
-      { name: 'W', mode: 'letters', match: 'W', desc: 'Index, middle, and ring fingers spread up', img: 'signs/W.png' },
-      { name: 'X', mode: 'letters', match: 'X', desc: 'Fist with index finger hooked/bent', img: 'signs/X.png' },
-      { name: 'Y', mode: 'letters', match: 'Y', desc: 'Extend thumb and pinky, curl other fingers down', img: 'signs/Y.png' },
-      { name: 'Z', mode: 'letters', match: 'Z', desc: 'Trace a Z in the air with your index finger', img: 'signs/Z.png' },
+      { name: 'A', mode: 'letters', match: 'A', desc: 'Make a fist with your thumb resting on the side', img: 'signs/A.jpg' },
+      { name: 'B', mode: 'letters', match: 'B', desc: 'Flat hand, fingers together pointing up, thumb tucked across palm', img: 'signs/B.jpg' },
+      { name: 'C', mode: 'letters', match: 'C', desc: 'Curve your hand into a C shape', img: 'signs/C.jpg' },
+      { name: 'D', mode: 'letters', match: 'D', desc: 'Index finger up, other fingers curl down to touch thumb', img: 'signs/D.jpg' },
+      { name: 'E', mode: 'letters', match: 'E', desc: 'Curl all fingers down, thumb tucked under fingers', img: 'signs/E.jpg' },
+      { name: 'F', mode: 'letters', match: 'F', desc: 'Index and thumb form a circle, other 3 fingers spread up', img: 'signs/F.jpg' },
+      { name: 'G', mode: 'letters', match: 'G', desc: 'Index finger and thumb pointing sideways, parallel', img: 'signs/G.jpg' },
+      { name: 'H', mode: 'letters', match: 'H', desc: 'Index and middle fingers extended sideways together', img: 'signs/H.jpg' },
+      { name: 'I', mode: 'letters', match: 'I', desc: 'Make a fist with only your pinky raised', img: 'signs/I.jpg' },
+      { name: 'J', mode: 'letters', match: 'J', desc: 'Start with pinky up, trace a J shape downward', img: 'signs/J.jpg' },
+      { name: 'K', mode: 'letters', match: 'K', desc: 'Index and middle finger up in a V, thumb between them', img: 'signs/K.jpg' },
+      { name: 'L', mode: 'letters', match: 'L', desc: 'L shape — index finger up, thumb out to the side', img: 'signs/L.jpg' },
+      { name: 'M', mode: 'letters', match: 'M', desc: 'Fist with thumb tucked under three fingers', img: 'signs/M.jpg' },
+      { name: 'N', mode: 'letters', match: 'N', desc: 'Fist with thumb tucked under two fingers', img: 'signs/N.jpg' },
+      { name: 'O', mode: 'letters', match: 'O', desc: 'All fingertips touch thumb forming an O', img: 'signs/O.jpg' },
+      { name: 'P', mode: 'letters', match: 'P', desc: 'Index and middle finger pointing down, thumb sticking out between them', img: 'signs/P.jpg' },
+      { name: 'Q', mode: 'letters', match: 'Q', desc: 'Thumb and index finger pointing downward together, other fingers curled in', img: 'signs/Q.jpg' },
+      { name: 'R', mode: 'letters', match: 'R', desc: 'Cross your index and middle fingers', img: 'signs/R.jpg' },
+      { name: 'S', mode: 'letters', match: 'S', desc: 'Fist with thumb over the front of fingers', img: 'signs/S.jpg' },
+      { name: 'T', mode: 'letters', match: 'T', desc: 'Fist with thumb tucked between index and middle finger', img: 'signs/T.jpg' },
+      { name: 'U', mode: 'letters', match: 'U', desc: 'Index and middle fingers up together, side by side', img: 'signs/U.jpg' },
+      { name: 'V', mode: 'letters', match: 'V', desc: 'Index and middle fingers spread apart — peace sign', img: 'signs/V.jpg' },
+      { name: 'W', mode: 'letters', match: 'W', desc: 'Index, middle, and ring fingers spread up', img: 'signs/W.jpg' },
+      { name: 'X', mode: 'letters', match: 'X', desc: 'Fist with index finger hooked/bent', img: 'signs/X.jpg' },
+      { name: 'Y', mode: 'letters', match: 'Y', desc: 'Extend thumb and pinky, curl other fingers down', img: 'signs/Y.jpg' },
+      { name: 'Z', mode: 'letters', match: 'Z', desc: 'Trace a Z in the air with your index finger', img: 'signs/Z.jpg' },
       // Words
-      { name: 'HELLO', mode: 'words', match: 'HELLO', desc: 'Flat hand at forehead, move outward like a salute wave', img: 'signs/HELLO.png' },
-      { name: 'GOODBYE', mode: 'words', match: 'GOODBYE', desc: 'Open hand, wave by folding fingers down repeatedly', img: 'signs/GOODBYE.png' },
-      { name: 'OK', mode: 'words', match: 'OK', desc: 'Touch index finger and thumb to form a circle', img: 'signs/OK.png' },
-      { name: 'THANK YOU', mode: 'words', match: 'THANK_YOU', desc: 'Touch chin with fingertips, then move hand outward and down', img: 'signs/THANK_YOU.png' },
-      { name: 'I LOVE YOU', mode: 'words', match: 'I_LOVE_YOU', desc: 'Extend pinky, index finger, and thumb — like a rock sign with thumb out', img: 'signs/I_LOVE_YOU.png' },
-      { name: 'SIGMA', mode: 'words', match: 'SIGMA', desc: 'S sign on one hand moving up while the other hand points downwards', img: 'signs/SIGMA.png' },
-      { name: 'BADDIE', mode: 'words', match: 'BADDIE', desc: 'Quiet coyote to the side of the jaw', img: 'signs/BADDIE.png' },
-      { name: 'RIZZ', mode: 'words', match: 'RIZZ', desc: 'R sign moving from the side of the jaw towards the front', img: 'signs/RIZZ.png' },
-      { name: '6-7', mode: 'words', match: '6_7', desc: 'Alternate raising and lowering your right and left hand quickly', img: 'signs/6_7.png' },
+      { name: 'HELLO', mode: 'words', match: 'HELLO', desc: 'Flat hand at forehead, move outward like a salute wave', img: 'signs/HELLO.mp4' },
+      { name: 'GOODBYE', mode: 'words', match: 'GOODBYE', desc: 'Open hand, wave by folding fingers down repeatedly', img: 'signs/GOODBYE.mp4' },
+      { name: 'OK', mode: 'words', match: 'OK', desc: 'Touch index finger and thumb to form a circle', img: 'signs/OK.mp4' },
+      { name: 'THANK YOU', mode: 'words', match: 'THANK_YOU', desc: 'Touch chin with fingertips, then move hand outward and down', img: 'signs/THANK_YOU.mp4' },
+      { name: 'I LOVE YOU', mode: 'words', match: 'I_LOVE_YOU', desc: 'Extend pinky, index finger, and thumb — like a rock sign with thumb out', img: 'signs/I_LOVE_YOU.mp4' },
+      { name: 'SIGMA', mode: 'words', match: 'SIGMA', desc: 'S sign on one hand moving up while the other hand points downwards', img: 'signs/SIGMA.mp4' },
+      { name: 'BADDIE', mode: 'words', match: 'BADDIE', desc: 'Quiet coyote to the side of the jaw', img: 'signs/BADDIE.mp4' },
+      { name: 'RIZZ', mode: 'words', match: 'RIZZ', desc: 'R sign moving from the side of the jaw towards the front', img: 'signs/RIZZ.mp4' },
+      { name: '6-7', mode: 'words', match: '6_7', desc: 'Alternate raising and lowering your right and left hand quickly', img: 'signs/6_7.mp4' },
     ];
 
     let tutorialIndex = 0;
@@ -1510,8 +1511,11 @@
         <div class="tutorial-card" id="tutorialCard">
           <div class="tutorial-sign-name">${sign.name}</div>
           <div class="tutorial-image">
-            <img src="${sign.img}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="${sign.name}">
-            <div class="placeholder-letter" style="display:none">${sign.name.charAt(0)}</div>
+            ${sign.img.endsWith('.mp4')
+              ? `<video src="${sign.img}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:contain;"></video>`
+              : `<img src="${sign.img}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="${sign.name}">
+            <div class="placeholder-letter" style="display:none">${sign.name.charAt(0)}</div>`
+            }
           </div>
           <div class="tutorial-desc">${sign.desc}</div>
           ${sign.dynamic ? `<div class="tutorial-dynamic">${sign.dynamic}</div>` : ''}

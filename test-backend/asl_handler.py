@@ -27,7 +27,7 @@ STABLE_FRAMES = 4
 COOLDOWN_FRAMES = 6
 
 LSTM_CONFIDENCE_THRESHOLD = 0.3
-PREDICTION_INTERVAL = 5
+PREDICTION_INTERVAL = 2
 
 WORD_TO_LETTER = {
     "THANK_YOU": "T",
@@ -40,12 +40,14 @@ WORD_TO_LETTER = {
 
 
 class PredictionSmoother:
-    """Smooths static letter predictions over time."""
+    """Smooths predictions over a sliding window before accepting."""
 
-    def __init__(self, window_size=12, stable_count=8, cooldown=15):
+    def __init__(self, window_size=12, stable_count=8, cooldown=15,
+                 confidence_threshold=STATIC_CONFIDENCE_THRESHOLD):
         self.window = deque(maxlen=window_size)
         self.stable_count = stable_count
         self.cooldown = cooldown
+        self.confidence_threshold = confidence_threshold
         self.cooldown_counter = 0
         self.last_accepted = None
 
@@ -53,7 +55,7 @@ class PredictionSmoother:
         if self.cooldown_counter > 0:
             self.cooldown_counter -= 1
 
-        if confidence < STATIC_CONFIDENCE_THRESHOLD:
+        if confidence < self.confidence_threshold:
             self.window.append(None)
             return None, 0
 
@@ -104,23 +106,24 @@ class ASLDetectionSession:
             cooldown=COOLDOWN_FRAMES,
         )
 
+        # Word smoothing — same pattern as letters
+        self.word_smoother = PredictionSmoother(
+            window_size=8,
+            stable_count=4,
+            cooldown=8,
+            confidence_threshold=LSTM_CONFIDENCE_THRESHOLD,
+        )
+
         # Word detection state
         self.word_buffer = deque(maxlen=SEQUENCE_LENGTH)
         self.frame_count = 0
-        self.current_word_pred = None
-        self.current_word_conf = 0.0
-        self.last_word_accepted = None
-        self.word_cooldown = 0
 
     def set_mode(self, mode):
         if mode in ("letters", "words"):
             self.mode = mode
             self.smoother.reset()
+            self.word_smoother.reset()
             self.word_buffer.clear()
-            self.current_word_pred = None
-            self.current_word_conf = 0.0
-            self.last_word_accepted = None
-            self.word_cooldown = 0
 
     def process_frame(self, jpeg_bytes):
         """
@@ -195,6 +198,9 @@ class ASLDetectionSession:
             elif len(self.word_buffer) > 0:
                 self.word_buffer.append(self.word_buffer[-1])
 
+            word_pred = None
+            word_conf = 0.0
+
             if len(self.word_buffer) == SEQUENCE_LENGTH:
                 if self.frame_count % PREDICTION_INTERVAL == 0:
                     try:
@@ -204,33 +210,27 @@ class ASLDetectionSession:
                         predictions = self.lstm_model.predict(
                             sequence, verbose=0
                         )[0]
-                        self.current_word_pred = int(np.argmax(predictions))
-                        self.current_word_conf = float(
-                            predictions[self.current_word_pred]
-                        )
+                        word_pred = int(np.argmax(predictions))
+                        word_conf = float(predictions[word_pred])
                     except Exception:
                         pass
 
-            if self.word_cooldown > 0:
-                self.word_cooldown -= 1
+            # Feed through smoother — same pattern as letters
+            if word_pred is not None:
+                accepted, conf = self.word_smoother.update(word_pred, word_conf)
+            else:
+                accepted, conf = self.word_smoother.update(None, 0)
 
-            if (
-                self.current_word_pred is not None
-                and self.current_word_conf >= LSTM_CONFIDENCE_THRESHOLD
-                and self.current_word_pred != self.last_word_accepted
-                and self.word_cooldown == 0
-            ):
-                word_name = SEQUENCE_LABELS[self.current_word_pred]
+            if accepted is not None:
+                word_name = SEQUENCE_LABELS[accepted]
                 display = WORD_TO_LETTER.get(word_name, word_name)
-                self.last_word_accepted = self.current_word_pred
-                self.word_cooldown = 30
                 results_out.append(
                     {
                         "type": "detection",
                         "kind": "word",
                         "value": display,
                         "word": word_name,
-                        "confidence": round(self.current_word_conf, 3),
+                        "confidence": round(conf, 3),
                     }
                 )
 

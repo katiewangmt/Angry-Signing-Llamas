@@ -1674,6 +1674,20 @@
     let isDetecting = false;
     let frameLoopTimer = null;
 
+    // Determine backend WebSocket URL - handles dev mode (frontend on 3000, backend on 8000)
+    function getBackendWebSocketUrl(path) {
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const port = window.location.port;
+      const hostname = window.location.hostname;
+      
+      // If running on port 3000 (dev frontend server), connect to backend on 8000
+      if (port === '3000' || (hostname === 'localhost' && (port === '' || port === '80'))) {
+        return `${wsProtocol}//localhost:8000${path}`;
+      }
+      // Otherwise use same origin (production or backend-serving-frontend)
+      return `${wsProtocol}//${window.location.host}${path}`;
+    }
+
     function showDetection(text) {
       document.getElementById('detectedText').innerHTML =
         text + '<span class="cursor"></span>';
@@ -1684,8 +1698,8 @@
       const video = document.getElementById('webcamVideo');
       if (!video.srcObject) return;
 
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      aslSocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/asl`);
+      const wsUrl = getBackendWebSocketUrl('/ws/asl');
+      aslSocket = new WebSocket(wsUrl);
 
       aslSocket.onopen = () => {
         isDetecting = true;
@@ -1702,6 +1716,7 @@
 
       aslSocket.onerror = (err) => {
         console.error('ASL WebSocket error:', err);
+        console.error(`Failed to connect to ASL WebSocket at ${wsUrl}. Make sure the backend server is running on port 8000.`);
       };
 
       aslSocket.onclose = () => {
@@ -1742,7 +1757,7 @@
         data: dataUrl,
       }));
 
-      frameLoopTimer = setTimeout(sendFrameLoop, 150); // ~7fps - optimized for free tier servers
+      frameLoopTimer = setTimeout(sendFrameLoop, 50); // ~20fps - higher frame rate for better responsiveness
     }
 
     const HAND_CONNECTIONS = [
@@ -2037,7 +2052,7 @@
     // ============================================================
     // STREAMING BEAT ENGINE (WebSocket + Web Audio API)
     // ============================================================
-    const WS_URL = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/ws/beat';
+    const WS_URL = getBackendWebSocketUrl('/ws/beat');
     let beatSocket = null;
     let audioCtx = null;
     let scriptNode = null;

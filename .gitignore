@@ -10,3 +10,31 @@ backend-java/generated/*.wav
 .DS_Store
 backend/target/
 __pycache__/
+*.pyc
+
+# Environment / secrets
+.env
+.env.local
+.env.production
+
+# Model & data files (use Git LFS or download separately)
+*.keras
+*.h5
+*.pkl
+*.npz
+*.task
+*.weights
+
+# Node
+node_modules/
+
+# Python virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

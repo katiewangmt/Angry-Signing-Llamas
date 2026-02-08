@@ -7,8 +7,12 @@ Audio streams in real-time — no waiting for full generation.
 import asyncio
 import base64
 import json
+import logging
 import os
 import sys
+
+logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO").upper())
+logger = logging.getLogger("signcraft")
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -32,11 +36,11 @@ try:
             api_key=GEMINI_API_KEY,
             http_options={"api_version": "v1alpha"},
         )
-        print("  Beat generation: enabled (GEMINI_API_KEY found)")
+        logger.info("Beat generation: enabled (GEMINI_API_KEY found)")
     else:
-        print("  Beat generation: disabled (no GEMINI_API_KEY)")
+        logger.warning("Beat generation: disabled (no GEMINI_API_KEY)")
 except ImportError:
-    print("  Beat generation: disabled (google-genai not installed)")
+    logger.warning("Beat generation: disabled (google-genai not installed)")
 
 # ── ASL detector imports ───────────────────────────────────────
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "asl-detector"))
@@ -50,10 +54,11 @@ lstm_model = None
 # ── FastAPI App ─────────────────────────────────────────
 app = FastAPI(title="Angry Silent Lamas")
 
+_cors_origins = os.environ.get("CORS_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_cors_origins,
+    allow_credentials=(_cors_origins != ["*"]),
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -86,11 +91,11 @@ async def load_asl_models():
                     loss="sparse_categorical_crossentropy",
                     metrics=["accuracy"],
                 )
-            print(f"  ASL: Static letter model loaded from {static_path}")
+            logger.info(f"ASL: Static letter model loaded from {static_path}")
         except Exception as e:
-            print(f"  ASL: Could not load static model: {e}")
+            logger.error(f"ASL: Could not load static model: {e}")
     else:
-        print(f"  ASL: Static model not found at {static_path}")
+        logger.warning(f"ASL: Static model not found at {static_path}")
 
     # Load LSTM word model
     if os.path.exists(lstm_path):
@@ -98,11 +103,11 @@ async def load_asl_models():
             from model_lstm import load_trained_model
 
             lstm_model = load_trained_model(lstm_path)
-            print(f"  ASL: LSTM word model loaded from {lstm_path}")
+            logger.info(f"ASL: LSTM word model loaded from {lstm_path}")
         except Exception as e:
-            print(f"  ASL: Could not load LSTM model: {e}")
+            logger.error(f"ASL: Could not load LSTM model: {e}")
     else:
-        print(f"  ASL: LSTM model not found at {lstm_path}")
+        logger.warning(f"ASL: LSTM model not found at {lstm_path}")
 
 
 @app.get("/")
@@ -112,7 +117,14 @@ async def root():
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "models": {
+            "static_letters": static_model is not None,
+            "lstm_words": lstm_model is not None,
+        },
+        "beat_generation": client is not None,
+    }
 
 
 @app.websocket("/ws/beat")

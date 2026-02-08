@@ -29,7 +29,12 @@ Open a terminal and run:
 ```bash
 cd ADI/test-backend
 pip install -r requirements.txt
+
+# Development (auto-reloads on code changes):
 uvicorn server:app --reload --port 8000
+
+# Production:
+uvicorn server:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
 The backend will start on `http://localhost:8000`

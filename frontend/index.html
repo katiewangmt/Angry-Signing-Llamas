@@ -330,6 +330,45 @@
       50% { opacity: 0; }
     }
 
+    /* === MODE TOGGLE === */
+    .mode-toggle {
+      display: flex;
+      gap: 0;
+      border: 3px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 3px 3px 0px var(--shadow);
+      transition: border-color 0.6s, box-shadow 0.4s;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 10px 16px;
+      background: var(--bg-card);
+      border: none;
+      color: var(--text-secondary);
+      font-family: 'Press Start 2P', cursive;
+      font-size: 9px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+
+    .mode-btn + .mode-btn {
+      border-left: 3px solid var(--border);
+    }
+
+    .mode-btn.active {
+      background: var(--accent);
+      color: var(--bg-primary);
+    }
+
+    .mode-btn:hover:not(.active) {
+      background: var(--accent-dim);
+      color: var(--text-primary);
+    }
+
     /* === BEAT GENERATOR === */
     .beat-section {
       display: flex;
@@ -717,10 +756,17 @@
         <!-- DETECTED SIGNS -->
         <section class="detection-section">
           <div class="section-label">Detected Signs</div>
+          <div class="mode-toggle">
+            <button class="mode-btn active" id="modeBtnLetters" onclick="setASLMode('letters')">Letters</button>
+            <button class="mode-btn" id="modeBtnWords" onclick="setASLMode('words')">Words</button>
+          </div>
           <div class="detected-output">
             <div class="detected-text" id="detectedText"><span class="cursor"></span></div>
           </div>
         </section>
+
+        <!-- Hidden canvas for frame capture -->
+        <canvas id="aslCanvas" width="320" height="240" style="display:none;"></canvas>
 
         <!-- BEAT GENERATOR -->
         <section class="beat-section">
@@ -897,11 +943,13 @@
           corners.forEach(c => c.style.display = 'block');
           cameraOn = true;
           startFpsCounter();
+          startASLDetection();
         } catch (err) {
           alert('Could not access camera. Please allow camera permissions.');
           console.error(err);
         }
       } else {
+        stopASLDetection();
         stream.getTracks().forEach(t => t.stop());
         video.srcObject = null;
         video.style.display = 'none';
@@ -932,22 +980,102 @@
     }
 
     // ============================================================
-    // DETECTED SIGNS — Backend hooks
+    // ASL DETECTION — WebSocket client + display
     // ============================================================
-    function addDetectedLetter(letter) {
-      detectedLetters += letter;
-      renderDetected();
-    }
+    let aslSocket = null;
+    let aslMode = 'letters';
+    let isDetecting = false;
+    let frameLoopTimer = null;
 
-    function addDetectedWord(word) {
-      if (detectedLetters.length > 0) detectedLetters += ' ';
-      detectedLetters += word;
-      renderDetected();
-    }
-
-    function renderDetected() {
+    function showDetection(text) {
       document.getElementById('detectedText').innerHTML =
-        detectedLetters + '<span class="cursor"></span>';
+        text + '<span class="cursor"></span>';
+    }
+
+    function startASLDetection() {
+      if (aslSocket) return;
+      const video = document.getElementById('webcamVideo');
+      if (!video.srcObject) return;
+
+      aslSocket = new WebSocket('ws://localhost:8000/ws/asl');
+
+      aslSocket.onopen = () => {
+        isDetecting = true;
+        sendFrameLoop();
+      };
+
+      aslSocket.onmessage = (event) => {
+        handleASLMessage(event);
+      };
+
+      aslSocket.onerror = (err) => {
+        console.error('ASL WebSocket error:', err);
+      };
+
+      aslSocket.onclose = () => {
+        isDetecting = false;
+        aslSocket = null;
+        if (frameLoopTimer) {
+          clearTimeout(frameLoopTimer);
+          frameLoopTimer = null;
+        }
+      };
+    }
+
+    function stopASLDetection() {
+      isDetecting = false;
+      if (frameLoopTimer) {
+        clearTimeout(frameLoopTimer);
+        frameLoopTimer = null;
+      }
+      if (aslSocket) {
+        try { aslSocket.send(JSON.stringify({ action: 'stop' })); } catch(e) {}
+        aslSocket.close();
+        aslSocket = null;
+      }
+    }
+
+    function sendFrameLoop() {
+      if (!isDetecting || !aslSocket || aslSocket.readyState !== WebSocket.OPEN) return;
+
+      const video = document.getElementById('webcamVideo');
+      const canvas = document.getElementById('aslCanvas');
+      const ctx = canvas.getContext('2d');
+
+      ctx.drawImage(video, 0, 0, 320, 240);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+
+      aslSocket.send(JSON.stringify({
+        action: 'frame',
+        data: dataUrl,
+      }));
+
+      frameLoopTimer = setTimeout(sendFrameLoop, 100); // 10fps
+    }
+
+    function handleASLMessage(event) {
+      const msg = JSON.parse(event.data);
+
+      if (msg.type === 'detection') {
+        if (msg.kind === 'letter') {
+          showDetection(msg.value);
+        } else if (msg.kind === 'word') {
+          showDetection(msg.word || msg.value);
+        }
+      }
+    }
+
+    function setASLMode(mode) {
+      aslMode = mode;
+
+      // Update toggle UI
+      document.getElementById('modeBtnLetters').classList.toggle('active', mode === 'letters');
+      document.getElementById('modeBtnWords').classList.toggle('active', mode === 'words');
+
+      // Tell backend
+      if (aslSocket && aslSocket.readyState === WebSocket.OPEN) {
+        aslSocket.send(JSON.stringify({ action: 'set_mode', mode: mode }));
+      }
     }
 
     // ============================================================

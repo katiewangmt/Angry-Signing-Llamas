@@ -1864,8 +1864,10 @@
       aslSocket.onmessage = (event) => {
         awaitingAslResponse = false;
         handleASLMessage(event);
-        // Send next frame now that we've received a response (flow control)
-        scheduleNextFrame();
+        // Send next frame immediately for high framerate (flow control handled by awaitingAslResponse)
+        if (isDetecting) {
+          sendFrame();
+        }
       };
 
       aslSocket.onerror = (err) => {
@@ -1877,7 +1879,7 @@
         isDetecting = false;
         aslSocket = null;
         if (frameLoopTimer) {
-          clearTimeout(frameLoopTimer);
+          cancelAnimationFrame(frameLoopTimer);
           frameLoopTimer = null;
         }
       };
@@ -1887,7 +1889,7 @@
       isDetecting = false;
       awaitingAslResponse = false;
       if (frameLoopTimer) {
-        clearTimeout(frameLoopTimer);
+        cancelAnimationFrame(frameLoopTimer);
         frameLoopTimer = null;
       }
       if (aslSocket) {
@@ -1926,8 +1928,11 @@
 
     function scheduleNextFrame() {
       if (!isDetecting) return;
-      // Small delay to avoid spinning too fast, but mostly paced by backend response time
-      frameLoopTimer = setTimeout(sendFrame, 16);
+      // Use requestAnimationFrame for smooth, high framerate sending
+      // This ensures frames are sent as fast as the backend can process them
+      frameLoopTimer = requestAnimationFrame(() => {
+        sendFrame();
+      });
     }
 
     // Legacy name kept for startASLDetection's onopen call
@@ -2752,12 +2757,8 @@
       if (leftIdx >= 0) {
         const leftItem = challengeItems[leftIdx];
         if (leftItem.x < -leftItem.width) {
-          if (challengeDifficulty === 'unlimited') {
-            markChallengeWrong(leftIdx);
-          } else {
-            // Easy/Hard: just skip it, no penalty
-            leftItem.state = 'done';
-          }
+          // All modes: count items going off screen as wrong
+          markChallengeWrong(leftIdx);
         }
       }
 
@@ -2864,9 +2865,13 @@
         if (challengeItems[idx]) challengeItems[idx].state = 'done';
       }, 500);
       
-      // Check lose condition (unlimited mode only)
-      if (challengeDifficulty === 'unlimited' && challengeWrong >= UNLIMITED_LOSE) {
-        endUnlimitedChallenge();
+      // Check lose condition - all modes end at 10 wrong
+      if (challengeWrong >= CHALLENGE_LOSE) {
+        if (challengeDifficulty === 'unlimited') {
+          endUnlimitedChallenge();
+        } else {
+          endChallenge(false);
+        }
       }
     }
 

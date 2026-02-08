@@ -928,6 +928,178 @@
       animation: color-pulse 0.6s ease-out;
     }
 
+    /* === CHALLENGE MODE === */
+    .challenge-setup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      padding: 20px 16px;
+    }
+
+    .challenge-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 33px 0;
+    }
+
+    .challenge-section + .challenge-section {
+      border-top: 2px solid var(--border);
+    }
+
+    .challenge-difficulty {
+      display: flex;
+      gap: 0;
+      border: 3px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 3px 3px 0px var(--shadow);
+      width: 100%;
+    }
+
+    .diff-btn {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border: none;
+      color: var(--text-secondary);
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .diff-btn + .diff-btn {
+      border-left: 3px solid var(--border);
+    }
+
+    .diff-btn.active {
+      background: var(--accent);
+      color: var(--bg-primary);
+    }
+
+    .diff-btn:hover:not(.active) {
+      background: var(--accent-dim);
+      color: var(--text-primary);
+    }
+
+    .challenge-score {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .score-box {
+      flex: 1;
+      padding: 12px 10px;
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      border-radius: 4px;
+      text-align: center;
+      box-shadow: 3px 3px 0px var(--shadow);
+    }
+
+    .score-box.correct-box { border-color: var(--accent); }
+    .score-box.wrong-box { border-color: var(--danger); }
+
+    .score-label {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 8px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .score-value {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 28px;
+    }
+
+    .score-value.correct-val { color: var(--accent); }
+    .score-value.wrong-val { color: var(--danger); }
+
+    .challenge-info {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .challenge-result {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 30px 16px;
+    }
+
+    .challenge-result-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 16px;
+    }
+
+    .challenge-result-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    /* Scrolling bar overlay on webcam */
+    .challenge-scroll-bar {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      right: 0;
+      height: 56px;
+      display: none;
+      align-items: center;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    [data-theme="dark"] .challenge-scroll-bar {
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    [data-theme="light"] .challenge-scroll-bar {
+      background: rgba(200, 200, 200, 0.6);
+    }
+
+    .challenge-scroll-bar.visible { display: flex; }
+
+    .scroll-letter {
+      position: absolute;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 22px;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+
+    [data-theme="dark"] .scroll-letter { color: #ffffff; }
+    [data-theme="light"] .scroll-letter { color: #1a1a1a; }
+
+    .scroll-letter.active {
+      color: var(--accent);
+    }
+
+    .scroll-letter.wrong {
+      color: var(--danger);
+    }
+
+    .scroll-letter.correct {
+      color: var(--accent);
+      opacity: 0.5;
+    }
+
     /* === RESPONSIVE: stack on small screens === */
     @media (max-width: 800px) {
       .app {
@@ -988,6 +1160,7 @@
           <div class="corner-deco tr" style="display:none;"></div>
           <div class="corner-deco bl" style="display:none;"></div>
           <div class="corner-deco br" style="display:none;"></div>
+          <div class="challenge-scroll-bar" id="challengeScrollBar"></div>
           <button class="cam-btn active" id="camStopBtn" onclick="toggleCamera()" style="display:none;position:absolute;bottom:10px;right:10px;">Stop Camera</button>
         </div>
       </div>
@@ -1069,9 +1242,68 @@
 
         <!-- ==================== TAB 3: CHALLENGE ==================== -->
         <div class="tab-content" id="tabChallenge">
-          <div class="section-label">Challenge</div>
-          <div style="padding:30px 10px;text-align:center;">
-            <div style="font-family:'Press Start 2P',cursive;font-size:10px;color:var(--text-secondary);opacity:0.5;">Coming soon...</div>
+          <div id="challengeContent">
+            <div class="challenge-setup" id="challengeSetup">
+              <!-- Section 1: Difficulty -->
+              <div class="challenge-section">
+                <div class="section-label" style="width:100%;">Difficulty</div>
+                <div class="challenge-difficulty">
+                  <button class="diff-btn active" id="diffEasy" onclick="setChallengeDifficulty('easy')">Easy</button>
+                  <button class="diff-btn" id="diffHard" onclick="setChallengeDifficulty('hard')">Hard</button>
+                </div>
+                <div class="challenge-info" id="challengeDiffDesc">Letters only (A-Z) &mdash; Get 10 correct to win</div>
+              </div>
+              <!-- Section 2: Speed -->
+              <div class="challenge-section">
+                <div style="width:100%;display:flex;flex-direction:column;gap:6px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div class="score-label">Speed</div>
+                    <div class="score-label" id="speedLabel">Normal</div>
+                  </div>
+                  <input type="range" id="challengeSpeedSlider" min="1" max="5" value="3" step="1" style="width:100%;accent-color:var(--accent);cursor:pointer;" oninput="updateSpeedLabel()">
+                  <div style="display:flex;justify-content:space-between;">
+                    <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-secondary);">Slow</span>
+                    <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-secondary);">Fast</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Section 3: Score (hidden until game starts) -->
+              <div class="challenge-section" id="challengeScoreSection" style="display:none;">
+                <div class="challenge-score">
+                  <div class="score-box correct-box">
+                    <div class="score-label">Correct</div>
+                    <div class="score-value correct-val" id="challengeCorrect">0</div>
+                  </div>
+                  <div class="score-box wrong-box">
+                    <div class="score-label">Wrong</div>
+                    <div class="score-value wrong-val" id="challengeWrong">0</div>
+                  </div>
+                </div>
+                <div class="challenge-info" id="challengeGoalText" style="font-size:11px;">10 wrong = game over</div>
+              </div>
+              <!-- Action buttons -->
+              <div class="challenge-section" style="border-top:none;padding-top:4px;">
+                <button class="cam-btn" id="challengeStartBtn" onclick="startChallenge()">Start Challenge</button>
+                <button class="cam-btn active" id="challengeQuitBtn" onclick="quitChallenge()" style="display:none;">Quit Challenge</button>
+              </div>
+            </div>
+            <div class="challenge-result" id="challengeResult" style="display:none;">
+              <img id="challengeResultImgWin" src="happyllama.webp" style="width:120px;height:120px;object-fit:contain;image-rendering:pixelated;display:none;" alt="">
+              <img id="challengeResultImgLose" src="sadllama.webp" style="width:120px;height:120px;object-fit:contain;image-rendering:pixelated;display:none;" alt="">
+              <div class="challenge-result-title" id="challengeResultTitle"></div>
+              <div class="challenge-result-sub" id="challengeResultSub"></div>
+              <div class="challenge-score" style="width:100%;padding:0 16px;">
+                <div class="score-box correct-box">
+                  <div class="score-label">Correct</div>
+                  <div class="score-value correct-val" id="challengeResultCorrect">0</div>
+                </div>
+                <div class="score-box wrong-box">
+                  <div class="score-label">Wrong</div>
+                  <div class="score-value wrong-val" id="challengeResultWrong">0</div>
+                </div>
+              </div>
+              <button class="cam-btn" onclick="resetChallenge()" style="margin-top:8px;">Play Again</button>
+            </div>
           </div>
         </div>
 
@@ -1391,6 +1623,8 @@
         }
         // Check tutorial match
         checkTutorialDetection(msg);
+        // Check challenge match
+        checkChallengeDetection(msg);
       }
     }
 
@@ -1424,6 +1658,10 @@
       // Set ASL mode based on active tab
       if (tab === 'tutorial') {
         updateTutorialMode();
+      }
+      // Hide challenge bar when not on challenge tab
+      if (tab !== 'challenge' && challengeActive) {
+        stopChallenge();
       }
     }
 
@@ -1475,9 +1713,9 @@
     let tutorialAdvanceTimer = null;
 
     function initTutorial() {
-      // Load progress from localStorage
-      const saved = localStorage.getItem('asl-tutorial-index');
-      if (saved !== null) tutorialIndex = Math.min(parseInt(saved), TUTORIAL_SIGNS.length);
+      // Always start fresh on page load
+      tutorialIndex = 0;
+      localStorage.setItem('asl-tutorial-index', 0);
       renderTutorial();
     }
 
@@ -1863,6 +2101,363 @@
       beatPlaying = true;
 
       connectBeatSocket(beat.prompt, 120);
+    }
+    // ============================================================
+    // CHALLENGE MODE
+    // ============================================================
+    const CHALLENGE_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const CHALLENGE_WORDS = ['HELLO', 'GOODBYE', 'OK', 'THANK_YOU', 'I_LOVE_YOU', 'SIGMA', 'BADDIE', 'RIZZ', '6_7'];
+
+    let challengeDifficulty = 'easy';
+    let challengeActive = false;
+    let challengeCorrect = 0;
+    let challengeWrong = 0;
+    let challengeItems = []; // {label, x, width, wrongCount, state}
+    let challengeAnimFrame = null;
+    let challengeLastTime = 0;
+
+    const CHALLENGE_WIN_EASY = 10;
+    const CHALLENGE_WIN_HARD = 15;
+    const CHALLENGE_LOSE = 10;
+    // Base speeds per difficulty — slider multiplies these
+    const BASE_SPEED_EASY = 45;
+    const BASE_SPEED_HARD = 65;
+    const SPEED_MULTIPLIERS = [0.5, 0.75, 1.0, 1.3, 1.6]; // slider 1-5
+    const SPEED_LABELS = ['Very Slow', 'Slow', 'Normal', 'Fast', 'Very Fast'];
+    const BASE_SPACING = 100;
+    const WRONG_ATTEMPT_LIMIT = 5;
+    let challengeLastLabel = null;
+    let challengeSpeedMult = 1.0;
+
+    function updateSpeedLabel() {
+      const slider = document.getElementById('challengeSpeedSlider');
+      const idx = parseInt(slider.value) - 1;
+      document.getElementById('speedLabel').textContent = SPEED_LABELS[idx];
+    }
+
+    function setChallengeDifficulty(diff) {
+      challengeDifficulty = diff;
+      document.getElementById('diffEasy').classList.toggle('active', diff === 'easy');
+      document.getElementById('diffHard').classList.toggle('active', diff === 'hard');
+      const winTarget = diff === 'easy' ? CHALLENGE_WIN_EASY : CHALLENGE_WIN_HARD;
+      const desc = diff === 'easy' ? 'Letters only (A-Z)' : 'Letters + Words';
+      document.getElementById('challengeDiffDesc').innerHTML =
+        `${desc} &mdash; Get ${winTarget} correct to win`;
+    }
+
+    function getRandomChallengeItem() {
+      let label;
+      let attempts = 0;
+      do {
+        if (challengeDifficulty === 'easy') {
+          label = CHALLENGE_LETTERS[Math.floor(Math.random() * CHALLENGE_LETTERS.length)];
+        } else {
+          if (Math.random() < 0.6) {
+            label = CHALLENGE_WORDS[Math.floor(Math.random() * CHALLENGE_WORDS.length)];
+          } else {
+            label = CHALLENGE_LETTERS[Math.floor(Math.random() * CHALLENGE_LETTERS.length)];
+          }
+        }
+        attempts++;
+      } while (attempts < 20 && label === challengeLastLabel);
+      challengeLastLabel = label;
+      return label;
+    }
+
+    // Measure text width for dynamic spacing
+    function measureLabelWidth(label) {
+      const display = label.replace(/_/g, ' ');
+      // ~14px per char in Press Start 2P at 22px font-size
+      return display.length * 14 + 20;
+    }
+
+    function startChallenge() {
+      if (!cameraOn) {
+        alert('Please start the camera first!');
+        return;
+      }
+
+      challengeActive = true;
+      challengeCorrect = 0;
+      challengeWrong = 0;
+      challengeItems = [];
+      challengeLastTime = 0;
+      challengeLastLabel = null;
+
+      // Read speed from slider
+      const sliderVal = parseInt(document.getElementById('challengeSpeedSlider').value) - 1;
+      challengeSpeedMult = SPEED_MULTIPLIERS[sliderVal];
+
+      updateChallengeScore();
+
+      // Set ASL mode — "both" for hard, "letters" for easy
+      const mode = challengeDifficulty === 'hard' ? 'both' : 'letters';
+      if (aslSocket && aslSocket.readyState === WebSocket.OPEN) {
+        aslSocket.send(JSON.stringify({ action: 'set_mode', mode: mode }));
+      }
+
+      // UI: hide start, show quit, show score
+      document.getElementById('challengeStartBtn').style.display = 'none';
+      document.getElementById('challengeQuitBtn').style.display = 'inline-block';
+      document.getElementById('challengeScoreSection').style.display = 'flex';
+      document.getElementById('diffEasy').disabled = true;
+      document.getElementById('diffHard').disabled = true;
+      document.getElementById('challengeSpeedSlider').disabled = true;
+
+      // Show scroll bar
+      const bar = document.getElementById('challengeScrollBar');
+      bar.classList.add('visible');
+      bar.innerHTML = '';
+
+      // Spawn initial items across the bar
+      const barWidth = bar.offsetWidth || 600;
+      let nextX = barWidth;
+      for (let i = 0; i < 3; i++) {
+        const label = getRandomChallengeItem();
+        const w = measureLabelWidth(label);
+        spawnChallengeItem(nextX, label);
+        nextX += w + BASE_SPACING;
+      }
+
+      challengeAnimFrame = requestAnimationFrame(challengeLoop);
+    }
+
+    function spawnChallengeItem(x, label) {
+      if (!label) label = getRandomChallengeItem();
+      const w = measureLabelWidth(label);
+      const item = { label, x, width: w, wrongCount: 0, state: 'active' };
+      challengeItems.push(item);
+
+      const el = document.createElement('div');
+      el.className = 'scroll-letter';
+      el.textContent = label.replace(/_/g, ' ');
+      el.style.left = x + 'px';
+      document.getElementById('challengeScrollBar').appendChild(el);
+    }
+
+    function challengeLoop(timestamp) {
+      if (!challengeActive) return;
+
+      if (!challengeLastTime) challengeLastTime = timestamp;
+      const dt = (timestamp - challengeLastTime) / 1000;
+      challengeLastTime = timestamp;
+
+      const bar = document.getElementById('challengeScrollBar');
+      const barWidth = bar.offsetWidth || 600;
+      const els = bar.querySelectorAll('.scroll-letter');
+      const leftIdx = getLeftmostActiveIndex();
+
+      const baseSpeed = challengeDifficulty === 'hard' ? BASE_SPEED_HARD : BASE_SPEED_EASY;
+      const speed = baseSpeed * challengeSpeedMult;
+      const grace = speed; // ~1 second grace at current speed
+
+      // Move active items left
+      challengeItems.forEach((item) => {
+        if (item.state === 'active') {
+          item.x -= speed * dt;
+        }
+      });
+
+      // Update DOM positions
+      els.forEach((el, i) => {
+        const item = challengeItems[i];
+        if (!item) return;
+
+        // Remove finished items from DOM
+        if (item.state === 'done') {
+          el.style.display = 'none';
+          return;
+        }
+
+        el.style.left = item.x + 'px';
+        el.className = 'scroll-letter';
+        if (item.state === 'correct') el.classList.add('correct');
+        else if (item.state === 'wrong') el.classList.add('wrong');
+        else if (i === leftIdx) el.classList.add('active');
+      });
+
+      // Check if leftmost passed grace zone — flash red then remove
+      if (leftIdx >= 0) {
+        const leftItem = challengeItems[leftIdx];
+        if (leftItem.x < -grace) {
+          markChallengeWrong(leftIdx);
+        }
+      }
+
+      // Spawn new items with longer delay
+      let rightmostX = 0;
+      let rightmostWidth = 0;
+      challengeItems.forEach((item) => {
+        if (item.state === 'active' && item.x > rightmostX) {
+          rightmostX = item.x;
+          rightmostWidth = item.width;
+        }
+      });
+      const nextStart = rightmostX + rightmostWidth + BASE_SPACING;
+      if (nextStart < barWidth + 100) {
+        spawnChallengeItem(nextStart);
+      }
+
+      challengeAnimFrame = requestAnimationFrame(challengeLoop);
+    }
+
+    function getLeftmostActiveIndex() {
+      let minX = Infinity;
+      let minIdx = -1;
+      challengeItems.forEach((item, i) => {
+        if (item.state === 'active' && item.x < minX) {
+          minX = item.x;
+          minIdx = i;
+        }
+      });
+      return minIdx;
+    }
+
+    function checkChallengeDetection(msg) {
+      if (!challengeActive) return;
+      if (msg.type !== 'detection') return;
+
+      const leftIdx = getLeftmostActiveIndex();
+      if (leftIdx < 0) return;
+
+      const item = challengeItems[leftIdx];
+      let detected = '';
+
+      if (msg.kind === 'letter') detected = msg.value;
+      else if (msg.kind === 'word') detected = msg.word || msg.value;
+      if (!detected) return;
+
+      const isLetter = item.label.length === 1;
+
+      if (isLetter) {
+        if (msg.kind === 'letter' && detected === item.label) {
+          markChallengeCorrect(leftIdx);
+        } else if (msg.kind === 'letter') {
+          item.wrongCount++;
+          if (item.wrongCount >= WRONG_ATTEMPT_LIMIT) markChallengeWrong(leftIdx);
+        }
+      } else {
+        if (msg.kind === 'word' && detected === item.label) {
+          markChallengeCorrect(leftIdx);
+        } else if (msg.kind === 'word') {
+          item.wrongCount++;
+          if (item.wrongCount >= WRONG_ATTEMPT_LIMIT) markChallengeWrong(leftIdx);
+        }
+      }
+    }
+
+    function markChallengeCorrect(idx) {
+      // Mark as 'correct' immediately — getLeftmostActiveIndex skips non-active,
+      // so next detection instantly targets the next item
+      challengeItems[idx].state = 'correct';
+      challengeCorrect++;
+      updateChallengeScore();
+      setTimeout(() => {
+        if (challengeItems[idx]) challengeItems[idx].state = 'done';
+      }, 350);
+      const winTarget = challengeDifficulty === 'hard' ? CHALLENGE_WIN_HARD : CHALLENGE_WIN_EASY;
+      if (challengeCorrect >= winTarget) endChallenge(true);
+    }
+
+    function markChallengeWrong(idx) {
+      challengeItems[idx].state = 'wrong';
+      challengeWrong++;
+      updateChallengeScore();
+      setTimeout(() => {
+        if (challengeItems[idx]) challengeItems[idx].state = 'done';
+      }, 500);
+      if (challengeWrong >= CHALLENGE_LOSE) endChallenge(false);
+    }
+
+    function updateChallengeScore() {
+      document.getElementById('challengeCorrect').textContent = challengeCorrect;
+      document.getElementById('challengeWrong').textContent = challengeWrong;
+    }
+
+    function endChallenge(won) {
+      challengeActive = false;
+      if (challengeAnimFrame) {
+        cancelAnimationFrame(challengeAnimFrame);
+        challengeAnimFrame = null;
+      }
+      challengeLastTime = 0;
+
+      const bar = document.getElementById('challengeScrollBar');
+      bar.classList.remove('visible');
+      bar.innerHTML = '';
+
+      document.getElementById('challengeSetup').style.display = 'none';
+      document.getElementById('challengeQuitBtn').style.display = 'none';
+      const result = document.getElementById('challengeResult');
+      result.style.display = 'flex';
+
+      const title = document.getElementById('challengeResultTitle');
+      const sub = document.getElementById('challengeResultSub');
+      const imgWin = document.getElementById('challengeResultImgWin');
+      const imgLose = document.getElementById('challengeResultImgLose');
+
+      if (won) {
+        imgWin.style.display = 'block';
+        imgLose.style.display = 'none';
+        title.textContent = 'Great Job!';
+        title.style.color = 'var(--accent)';
+        title.style.fontSize = '24px';
+        const winTarget = challengeDifficulty === 'hard' ? CHALLENGE_WIN_HARD : CHALLENGE_WIN_EASY;
+        sub.textContent = `You nailed ${winTarget} signs!`;
+      } else {
+        imgWin.style.display = 'none';
+        imgLose.style.display = 'block';
+        title.textContent = 'Game Over';
+        title.style.color = 'var(--danger)';
+        title.style.fontSize = '24px';
+        sub.textContent = 'Too many misses. Keep practicing!';
+      }
+
+      document.getElementById('challengeResultCorrect').textContent = challengeCorrect;
+      document.getElementById('challengeResultWrong').textContent = challengeWrong;
+    }
+
+    function quitChallenge() {
+      challengeActive = false;
+      if (challengeAnimFrame) {
+        cancelAnimationFrame(challengeAnimFrame);
+        challengeAnimFrame = null;
+      }
+      challengeLastTime = 0;
+
+      const bar = document.getElementById('challengeScrollBar');
+      bar.classList.remove('visible');
+      bar.innerHTML = '';
+
+      // Reset UI
+      document.getElementById('challengeStartBtn').style.display = 'inline-block';
+      document.getElementById('challengeQuitBtn').style.display = 'none';
+      document.getElementById('challengeScoreSection').style.display = 'none';
+      document.getElementById('diffEasy').disabled = false;
+      document.getElementById('diffHard').disabled = false;
+      document.getElementById('challengeSpeedSlider').disabled = false;
+    }
+
+    function stopChallenge() {
+      quitChallenge();
+    }
+
+    function resetChallenge() {
+      challengeCorrect = 0;
+      challengeWrong = 0;
+      challengeItems = [];
+      challengeLastTime = 0;
+
+      document.getElementById('challengeSetup').style.display = 'flex';
+      document.getElementById('challengeResult').style.display = 'none';
+      document.getElementById('challengeStartBtn').style.display = 'inline-block';
+      document.getElementById('challengeQuitBtn').style.display = 'none';
+      document.getElementById('challengeScoreSection').style.display = 'none';
+      document.getElementById('diffEasy').disabled = false;
+      document.getElementById('diffHard').disabled = false;
+      document.getElementById('challengeSpeedSlider').disabled = false;
+
+      updateChallengeScore();
     }
   </script>
 </body>

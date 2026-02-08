@@ -119,7 +119,7 @@ class ASLDetectionSession:
         self.frame_count = 0
 
     def set_mode(self, mode):
-        if mode in ("letters", "words"):
+        if mode in ("letters", "words", "both"):
             self.mode = mode
             self.smoother.reset()
             self.word_smoother.reset()
@@ -170,7 +170,7 @@ class ASLDetectionSession:
         results_out.append(status)
 
         # ── Letter detection ──
-        if self.mode == "letters" and self.static_model is not None:
+        if self.mode in ("letters", "both") and self.static_model is not None:
             if hand_detected and landmarks is not None:
                 input_data = landmarks.reshape(1, -1)
                 prediction = self.static_model.predict(input_data, verbose=0)[0]
@@ -192,7 +192,7 @@ class ASLDetectionSession:
                 self.smoother.update(None, 0)
 
         # ── Word detection ──
-        elif self.mode == "words" and self.lstm_model is not None:
+        if self.mode in ("words", "both") and self.lstm_model is not None:
             if hand_detected and landmarks is not None:
                 self.word_buffer.append(landmarks)
             elif len(self.word_buffer) > 0:

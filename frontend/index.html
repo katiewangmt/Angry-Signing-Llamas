@@ -1749,7 +1749,16 @@
       const canvas = document.getElementById('aslCanvas');
       const ctx = canvas.getContext('2d');
 
-      ctx.drawImage(video, 0, 0, 320, 240);
+      // Match the video's actual aspect ratio to avoid distortion.
+      // The collector uses 640x480 (4:3), so scale down preserving ratio.
+      const vw = video.videoWidth || 640;
+      const vh = video.videoHeight || 480;
+      const scale = Math.min(640 / vw, 480 / vh);
+      const cw = Math.round(vw * scale);
+      const ch = Math.round(vh * scale);
+      canvas.width = cw;
+      canvas.height = ch;
+      ctx.drawImage(video, 0, 0, cw, ch);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
 
       aslSocket.send(JSON.stringify({

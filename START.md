@@ -1,80 +1,61 @@
-# How to Run SignCraft Web App
+# How to Run SignCraft (Hackathon Mode)
 
-## Quick Start (Easiest Method)
+SignCraft runs as **one server**: the backend serves the frontend + websockets + ASL.
 
-### Using the Startup Scripts
+## Quick Start (recommended)
 
-**Terminal 1 - Backend:**
-```bash
-cd ADI
-./start-backend.sh
-```
-
-**Terminal 2 - Frontend:**
-```bash
-cd ADI
-./start-frontend.sh
-```
-
-Then open **http://localhost:3000** in your browser.
-
----
-
-## Manual Start
-
-### 1. Start the Backend Server
-
-Open a terminal and run:
+From the repo root:
 
 ```bash
-cd ADI/test-backend
-pip install -r requirements.txt
-uvicorn server:app --reload --port 8000
+chmod +x run_local.sh
+./run_local.sh
 ```
 
-The backend will start on `http://localhost:8000`
+Open: `http://localhost:8000`
 
-### 2. Start the Frontend
+## “Professional demo” (public HTTPS link, still fast)
 
-Open another terminal and run:
+This keeps ASL running on your laptop CPU (fast), but gives you a shareable URL for judges.
+
+1) Install Cloudflare Tunnel:
+
+- **macOS**:
 
 ```bash
-cd ADI/frontend
-# Option 1: Using Python's built-in server
-python3 -m http.server 3000
-# or
-python -m http.server 3000
-
-# Option 2: Using npx serve (if you have Node.js)
-npx serve . -p 3000
+brew install cloudflare/cloudflare/cloudflared
 ```
 
-### 3. Open in Browser
+- **Windows**:
 
-Open your browser and go to:
-- **http://localhost:3000** (or the port you chose)
+```bash
+winget install Cloudflare.cloudflared
+```
 
-## What You'll See
+2) Run:
 
-- **Live Feed**: Webcam feed with ASL detection
-- **Detected Signs**: Real-time letter/word detection
-- **ASL Alphabet Tutorial**: Scrollable grid showing all 26 letters with sign images
-- **Beat Generator**: (Optional) Music generation feature
+```bash
+chmod +x share_public.sh
+./share_public.sh
+```
+
+Copy the `https://*.trycloudflare.com` URL from the terminal and use it for your demo.
+
+## Environment variables
+
+### Beat generator (optional)
+
+Create `test-backend/.env` (do not commit it) with:
+
+```bash
+GEMINI_API_KEY='your-key-here'
+```
 
 ## Troubleshooting
 
-### Backend Issues
-- Make sure TensorFlow models are in `ADI/asl-detector/`:
-  - `asl_model.keras` (for letters)
-  - `asl_lstm_model.keras` (for words)
-- Check that all dependencies are installed: `pip install -r requirements.txt`
+- **No webcam**: allow camera permissions in the browser
+- **Port in use**: set a different port:
 
-### Frontend Issues
-- Make sure the backend is running on port 8000
-- Check browser console for CORS errors
-- Allow camera access when prompted
-
-### Port Conflicts
-- If port 8000 is taken, change the backend port and update `API_BASE` in `frontend/index.html`
-- If port 3000 is taken, use a different port for the frontend server
+```bash
+PORT=8010 ./run_local.sh
+```
 

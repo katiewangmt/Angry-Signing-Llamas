@@ -1120,6 +1120,35 @@
       .logo-img { width: 36px; height: 36px; }
       .logo .big { font-size: 22px; }
     }
+
+    /* === POPUP MODE (clean demo window) === */
+    body.popup-mode .header,
+    body.popup-mode .footer {
+      display: none;
+    }
+    body.popup-mode .app {
+      height: 100vh;
+    }
+    body.popup-mode .main {
+      height: 100vh;
+    }
+
+    .popout-btn {
+      margin-left: 10px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: 10px;
+      font-size: 11px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: transform 0.15s ease, border-color 0.2s ease;
+    }
+    .popout-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+    }
   </style>
 </head>
 <body>
@@ -1134,6 +1163,9 @@
           <div class="toggle-track"><div class="toggle-knob"></div></div>
           <span class="toggle-icon">☀️</span>
         </div>
+        <button class="popout-btn" onclick="openPopout()">
+          Pop out
+        </button>
       </div>
     </header>
 
@@ -1329,6 +1361,26 @@
     // ============================================================
     // Use same origin - works locally and when deployed
     const API_BASE = window.location.origin;
+
+    // ============================================================
+    // POP-OUT WINDOW (user-initiated to avoid popup blockers)
+    // ============================================================
+    function openPopout() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('popup', '1');
+      window.open(
+        url.toString(),
+        'SignCraftPopout',
+        'popup=yes,width=1280,height=800,menubar=no,toolbar=no,location=no,status=no'
+      );
+    }
+
+    (function applyPopupMode() {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('popup') === '1') {
+        document.body.classList.add('popup-mode');
+      }
+    })();
 
     const DEFAULT_DARK  = { accent: '#4ade80', dim: 'rgba(74,222,128,0.12)', glow: 'rgba(74,222,128,0.35)' };
     const DEFAULT_LIGHT = { accent: '#4a7a64', dim: 'rgba(74,122,100,0.1)', glow: 'rgba(74,122,100,0.2)' };

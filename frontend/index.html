@@ -1826,6 +1826,7 @@
     // ASL DETECTION — in-browser engine + display
     // ============================================================
     let aslEngine = null;
+    let aslStartToken = 0;
     let aslMode = 'letters';
     let isDetecting = false;
 
@@ -1853,10 +1854,19 @@
       const video = document.getElementById('webcamVideo');
       if (!video.srcObject) return;
 
-      aslEngine = await window.__createEngine({
+      const myToken = ++aslStartToken;
+      const engine = await window.__createEngine({
         video,
         onMessage: (msg) => handleASLMessage(msg),
       });
+
+      if (myToken !== aslStartToken || !video.srcObject) {
+        // Superseded by a stop/newer start while the engine was loading.
+        engine.stop();
+        return;
+      }
+
+      aslEngine = engine;
       isDetecting = true;
       // Set mode for current tab
       if (activeTab === 'tutorial') {
@@ -1866,6 +1876,7 @@
     }
 
     function stopASLDetection() {
+      aslStartToken++;
       isDetecting = false;
       if (aslEngine) {
         aslEngine.stop();

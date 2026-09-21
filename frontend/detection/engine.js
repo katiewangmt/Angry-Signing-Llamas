@@ -6,6 +6,7 @@ import { ASL_LABELS, SEQUENCE_LABELS, WORD_TO_LETTER } from "./labels.js";
 
 const SEQUENCE_LENGTH = 30;
 const PREDICTION_INTERVAL = 1;
+const FRAME_INTERVAL_MS = 33; // throttle detection to ~30fps to match LSTM training capture rate
 
 export async function createEngine({ video, onMessage }) {
   const hl = await createHandLandmarker();
@@ -15,7 +16,7 @@ export async function createEngine({ video, onMessage }) {
 
   let mode = "letters";
   let running = false;
-  let timestamp = 0;
+  let lastProcessMs = 0;
   let frameCount = 0;
   let rafId = null;
 
@@ -34,10 +35,14 @@ export async function createEngine({ video, onMessage }) {
 
   function processFrame() {
     if (!running) return;
-    timestamp += 33;
+    rafId = requestAnimationFrame(processFrame);
+
+    const now = performance.now();
+    if (now - lastProcessMs < FRAME_INTERVAL_MS) return;
+    lastProcessMs = now;
     frameCount += 1;
 
-    const hand = hl.detectForVideo(video, timestamp, flipCanvas, flipCtx);
+    const hand = hl.detectForVideo(video, now, flipCanvas, flipCtx);
     const handDetected = !!hand;
     const vec = handDetected ? extractLandmarks(hand) : null;
 
@@ -85,12 +90,10 @@ export async function createEngine({ video, onMessage }) {
         else onMessage({ type: "detection", kind: "word", value: display, word: wordName, confidence: c });
       }
     }
-
-    rafId = requestAnimationFrame(processFrame);
   }
 
   return {
-    start() { if (running) return; running = true; timestamp = 0; frameCount = 0; rafId = requestAnimationFrame(processFrame); },
+    start() { if (running) return; running = true; lastProcessMs = 0; frameCount = 0; rafId = requestAnimationFrame(processFrame); },
     stop() { running = false; if (rafId) cancelAnimationFrame(rafId); rafId = null; },
     setMode,
   };

@@ -20,4 +20,12 @@ with open(os.path.join(OUT, "landmarks_raw.json"), "w") as f:
     json.dump([{"x": float(r[0]), "y": float(r[1]), "z": float(r[2])} for r in raw], f)
 with open(os.path.join(OUT, "preprocess_expected.json"), "w") as f:
     json.dump([float(v) for v in vec], f)
+
+# Static model expected output on the fixed vector
+from model import load_trained_model as _load_static
+static = _load_static(os.path.join(os.path.dirname(__file__), "..", "asl-detector", "asl_model.keras"))
+probs = static.predict(vec.reshape(1, -1), verbose=0)[0]
+with open(os.path.join(OUT, "static_expected.json"), "w") as f:
+    json.dump({"argmax": int(np.argmax(probs)), "probs": [float(p) for p in probs]}, f)
+
 print("wrote fixtures: landmarks_raw.json, preprocess_expected.json")

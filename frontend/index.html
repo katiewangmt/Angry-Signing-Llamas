@@ -1649,6 +1649,12 @@
     <div class="footer fade-in">Angry Signing Llamas v1.0 — built at ADI 2026</div>
   </div>
 
+  <script src="./detection/vendor/tfjs/tf.min.js"></script>
+  <script type="module">
+    import { createEngine } from "./detection/engine.js";
+    window.__createEngine = createEngine;
+  </script>
+
   <script>
     // ============================================================
     // STATE
@@ -1817,20 +1823,18 @@
     }
 
     // ============================================================
-    // ASL DETECTION — WebSocket client + display
+    // ASL DETECTION — in-browser engine + display
     // ============================================================
-    let aslSocket = null;
+    let aslEngine = null;
     let aslMode = 'letters';
     let isDetecting = false;
-    let frameLoopTimer = null;
-    let awaitingAslResponse = false;
 
     // Determine backend WebSocket URL - handles dev mode (frontend on 3000, backend on 8000)
     function getBackendWebSocketUrl(path) {
       const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const port = window.location.port;
       const hostname = window.location.hostname;
-      
+
       // If running on port 3000 (dev frontend server), connect to backend on 8000
       if (port === '3000' || (hostname === 'localhost' && (port === '' || port === '80'))) {
         return `${wsProtocol}//localhost:8000${path}`;
@@ -1844,95 +1848,29 @@
       if (el) el.innerHTML = text + '<span class="cursor"></span>';
     }
 
-    function startASLDetection() {
-      if (aslSocket) return;
+    async function startASLDetection() {
+      if (aslEngine) return;
       const video = document.getElementById('webcamVideo');
       if (!video.srcObject) return;
 
-      const wsUrl = getBackendWebSocketUrl('/ws/asl');
-      aslSocket = new WebSocket(wsUrl);
-
-      aslSocket.onopen = () => {
-        isDetecting = true;
-        // Set mode for current tab
-        if (activeTab === 'tutorial') {
-          updateTutorialMode();
-        }
-        sendFrameLoop();
-      };
-
-      aslSocket.onmessage = (event) => {
-        awaitingAslResponse = false;
-        handleASLMessage(event);
-        // Send next frame paced by requestAnimationFrame (flow control)
-        scheduleNextFrame();
-      };
-
-      aslSocket.onerror = (err) => {
-        console.error('ASL WebSocket error:', err);
-        console.error(`Failed to connect to ASL WebSocket at ${wsUrl}. Make sure the backend server is running on port 8000.`);
-      };
-
-      aslSocket.onclose = () => {
-        isDetecting = false;
-        aslSocket = null;
-        if (frameLoopTimer) {
-          clearTimeout(frameLoopTimer);
-          frameLoopTimer = null;
-        }
-      };
+      aslEngine = await window.__createEngine({
+        video,
+        onMessage: (msg) => handleASLMessage(msg),
+      });
+      isDetecting = true;
+      // Set mode for current tab
+      if (activeTab === 'tutorial') {
+        updateTutorialMode();
+      }
+      aslEngine.start();
     }
 
     function stopASLDetection() {
       isDetecting = false;
-      awaitingAslResponse = false;
-      if (frameLoopTimer) {
-        clearTimeout(frameLoopTimer);
-        frameLoopTimer = null;
+      if (aslEngine) {
+        aslEngine.stop();
+        aslEngine = null;
       }
-      if (aslSocket) {
-        try { aslSocket.send(JSON.stringify({ action: 'stop' })); } catch(e) {}
-        aslSocket.close();
-        aslSocket = null;
-      }
-    }
-
-    function sendFrame() {
-      if (!isDetecting || !aslSocket || aslSocket.readyState !== WebSocket.OPEN) return;
-      if (awaitingAslResponse) return; // don't pile up frames
-
-      const video = document.getElementById('webcamVideo');
-      const canvas = document.getElementById('aslCanvas');
-      const ctx = canvas.getContext('2d');
-
-      // Match the video's actual aspect ratio to avoid distortion.
-      // The collector uses 640x480 (4:3), so scale down preserving ratio.
-      const vw = video.videoWidth || 640;
-      const vh = video.videoHeight || 480;
-      const scale = Math.min(640 / vw, 480 / vh);
-      const cw = Math.round(vw * scale);
-      const ch = Math.round(vh * scale);
-      canvas.width = cw;
-      canvas.height = ch;
-      ctx.drawImage(video, 0, 0, cw, ch);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-
-      awaitingAslResponse = true;
-      aslSocket.send(JSON.stringify({
-        action: 'frame',
-        data: dataUrl,
-      }));
-    }
-
-    function scheduleNextFrame() {
-      if (!isDetecting) return;
-      // Small delay to avoid spinning too fast, but mostly paced by backend response time
-      frameLoopTimer = setTimeout(sendFrame, 16);
-    }
-
-    // Legacy name kept for startASLDetection's onopen call
-    function sendFrameLoop() {
-      sendFrame();
     }
 
     const HAND_CONNECTIONS = [
@@ -1996,9 +1934,7 @@
       }
     }
 
-    function handleASLMessage(event) {
-      const msg = JSON.parse(event.data);
-
+    function handleASLMessage(msg) {
       if (msg.type === 'status') {
         updateAslFps();
         if (msg.landmarks) {
@@ -2218,9 +2154,7 @@
     function updateTutorialMode() {
       if (tutorialIndex >= TUTORIAL_SIGNS.length) return;
       const sign = TUTORIAL_SIGNS[tutorialIndex];
-      if (aslSocket && aslSocket.readyState === WebSocket.OPEN) {
-        aslSocket.send(JSON.stringify({ action: 'set_mode', mode: sign.mode }));
-      }
+      if (aslEngine) aslEngine.setMode(sign.mode);
     }
 
     function checkTutorialDetection(msg) {
@@ -2655,9 +2589,7 @@
 
       // Set ASL mode — "both" for hard/unlimited, "letters" for easy
       const mode = (challengeDifficulty === 'hard' || challengeDifficulty === 'unlimited') ? 'both' : 'letters';
-      if (aslSocket && aslSocket.readyState === WebSocket.OPEN) {
-        aslSocket.send(JSON.stringify({ action: 'set_mode', mode: mode }));
-      }
+      if (aslEngine) aslEngine.setMode(mode);
 
       // UI: compact spacing, hide start, show quit, show score
       document.getElementById('challengeSetup').classList.add('compact');

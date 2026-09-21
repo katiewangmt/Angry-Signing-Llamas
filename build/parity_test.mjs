@@ -61,4 +61,18 @@ if (argmax !== staticExpected.argmax) {
 assertClose(probs, staticExpected.probs, 1e-3, "static-model probs");
 console.log(`PASS static-model argmax (${argmax})`);
 
+// --- LSTM model parity ---
+const lstmSeq = JSON.parse(fs.readFileSync(path.join(F, "lstm_seq.json"), "utf8"));
+const lstmExpected = JSON.parse(fs.readFileSync(path.join(F, "lstm_expected.json"), "utf8"));
+const lstmModel = await loadLocalLayersModel(
+  path.join(__dirname, "..", "frontend", "detection", "models", "lstm", "model.json")
+);
+const lin = tf.tensor3d([lstmSeq]); // shape [1,30,63]
+const lout = lstmModel.predict(lin);
+const lprobs = Array.from(await lout.data());
+const largmax = lprobs.indexOf(Math.max(...lprobs));
+if (largmax !== lstmExpected.argmax) throw new Error(`lstm argmax ${largmax} != Python ${lstmExpected.argmax}`);
+assertClose(lprobs, lstmExpected.probs, 2e-3, "lstm-model probs");
+console.log(`PASS lstm-model argmax (${largmax})`);
+
 console.log("ALL PARITY CHECKS PASSED");

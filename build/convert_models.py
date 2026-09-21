@@ -96,14 +96,37 @@ def _rebuild_static():
 
 
 def _rebuild_lstm():
-    from model_lstm import create_lstm_model
-    return create_lstm_model()
+    # Built with legacy tf_keras (Keras 2) so tensorflowjs emits
+    # tfjs-layers-compatible JSON; mirrors model_lstm.create_lstm_model()
+    # minus the Dense L2 regularizer (no effect on predict()). See module docstring.
+    import tf_keras
+    from tf_keras import layers
+    from landmarks import NUM_FEATURES
+    from model_lstm import SEQUENCE_LENGTH, NUM_SEQUENCE_CLASSES
+
+    lstm_units = 128
+    dropout_rate = 0.3
+    return tf_keras.Sequential([
+        layers.Input(shape=(SEQUENCE_LENGTH, NUM_FEATURES), name="sequence_input"),
+        layers.LSTM(lstm_units, return_sequences=True, name="lstm_1"),
+        layers.BatchNormalization(),
+        layers.Dropout(dropout_rate),
+        layers.LSTM(lstm_units // 2, return_sequences=False, name="lstm_2"),
+        layers.BatchNormalization(),
+        layers.Dropout(dropout_rate),
+        layers.Dense(64, name="dense_1"),
+        layers.BatchNormalization(),
+        layers.Activation("relu"),
+        layers.Dropout(dropout_rate / 2),
+        layers.Dense(NUM_SEQUENCE_CLASSES, activation="softmax", name="sequence_output"),
+    ], name="ASL_Sequence_Classifier")
 
 
 if __name__ == "__main__":
     # Static model: force the robust rebuild path whenever the direct
     # convert's output isn't actually loadable by tfjs-layers (see docstring).
     convert(os.path.join(DETECTOR, "asl_model.keras"), "static", _rebuild_static, post_check=_assert_js_loadable)
-    # LSTM model: convert per the brief; its tfjs-layers load-compatibility
-    # and parity are validated by a later task, not this one.
-    convert(os.path.join(DETECTOR, "asl_lstm_model.keras"), "lstm", _rebuild_lstm)
+    # LSTM model: same treatment as the static model above — force the
+    # rebuild fallback whenever the direct convert's output isn't actually
+    # loadable by tfjs-layers, and verify it before proceeding.
+    convert(os.path.join(DETECTOR, "asl_lstm_model.keras"), "lstm", _rebuild_lstm, post_check=_assert_js_loadable)

@@ -28,4 +28,14 @@ probs = static.predict(vec.reshape(1, -1), verbose=0)[0]
 with open(os.path.join(OUT, "static_expected.json"), "w") as f:
     json.dump({"argmax": int(np.argmax(probs)), "probs": [float(p) for p in probs]}, f)
 
+# LSTM expected output on a fixed 30x63 sequence
+seq = rng.uniform(-1, 1, size=(30, 63)).astype(np.float32)
+from model_lstm import load_trained_model as _load_lstm
+lstm = _load_lstm(os.path.join(os.path.dirname(__file__), "..", "asl-detector", "asl_lstm_model.keras"))
+lprobs = lstm.predict(seq.reshape(1, 30, 63), verbose=0)[0]
+with open(os.path.join(OUT, "lstm_seq.json"), "w") as f:
+    json.dump(seq.tolist(), f)
+with open(os.path.join(OUT, "lstm_expected.json"), "w") as f:
+    json.dump({"argmax": int(np.argmax(lprobs)), "probs": [float(p) for p in lprobs]}, f)
+
 print("wrote fixtures: landmarks_raw.json, preprocess_expected.json")

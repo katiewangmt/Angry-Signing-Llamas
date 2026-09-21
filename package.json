@@ -6,6 +6,7 @@
     "convert": "python3 build/convert_models.py",
     "fixture": "python3 build/export_parity_fixture.py",
     "parity": "node build/parity_test.mjs",
+    "smoke:smoother": "node build/smoother_test.mjs",
     "tts": "python3 build/generate_tts.py",
     "dist": "node build/build_dist.mjs"
   },

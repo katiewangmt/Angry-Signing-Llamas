@@ -10,3 +10,7 @@ backend-java/generated/*.wav
 .DS_Store
 backend/target/
 __pycache__/
+
+# Node build tooling (vendored runtime deps in frontend/detection/vendor are NOT ignored)
+node_modules/
+build/fixtures/

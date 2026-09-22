@@ -546,7 +546,7 @@
     let challengeCorrect = 0;
     let challengeWrong = 0;
     let challengeScore = 0; // For unlimited mode
-    let challengeItems = []; // {label, x, width, wrongCount, state}
+    let challengeItems = []; // {label, x, width, state}
     let challengeAnimFrame = null;
     let challengeLastTime = 0;
 
@@ -563,7 +563,6 @@
     const SPEED_MULTIPLIERS = [0.5, 0.75, 1.0, 1.3, 1.6]; // slider 1-5
     const SPEED_LABELS = ['Very Slow', 'Slow', 'Normal', 'Fast', 'Very Fast'];
     const BASE_SPACING = 100;
-    const WRONG_ATTEMPT_LIMIT = 8;
     let challengeLastLabel = null;
     let challengeSpeedMult = 1.0;
 
@@ -748,7 +747,7 @@
     function spawnChallengeItem(x, label) {
       if (!label) label = getRandomChallengeItem();
       const w = measureLabelWidth(label);
-      const item = { label, x, width: w, wrongCount: 0, state: 'active' };
+      const item = { label, x, width: w, state: 'active' };
       challengeItems.push(item);
 
       const el = document.createElement('div');
@@ -862,17 +861,15 @@
       if (isLetter) {
         if (msg.kind === 'letter' && detected === item.label) {
           markChallengeCorrect(leftIdx);
-        } else if (msg.kind === 'letter') {
-          item.wrongCount++;
-          if (item.wrongCount >= WRONG_ATTEMPT_LIMIT) markChallengeWrong(leftIdx);
         }
+        // Non-matching letter detections are ignored (no penalty) — only a sign
+        // scrolling fully off-screen counts as wrong (see challengeLoop).
       } else {
         if (msg.kind === 'word' && detected === item.label) {
           markChallengeCorrect(leftIdx);
-        } else if (msg.kind === 'word') {
-          item.wrongCount++;
-          if (item.wrongCount >= WRONG_ATTEMPT_LIMIT) markChallengeWrong(leftIdx);
         }
+        // Non-matching word detections are ignored (no penalty) — only a sign
+        // scrolling fully off-screen counts as wrong (see challengeLoop).
       }
     }
 

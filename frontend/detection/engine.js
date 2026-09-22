@@ -20,7 +20,11 @@ export async function createEngine({ video, onMessage }) {
   let frameCount = 0;
   let rafId = null;
 
-  const letterSmoother = new PredictionSmoother({ windowSize: 8, stableCount: 4, cooldown: 8, confidenceThreshold: 0.65 });
+  // Letter "hold" tuning: windowSize/stableCount ≈ how many consecutive frames (~30fps)
+  // a sign must be held before it registers; confidenceThreshold ≈ how confident the
+  // model must be. Raised from {8,4,8,0.65} to require a more deliberate hold (~0.13s
+  // -> ~0.23s) so fleeting transitional poses between signs don't register as letters.
+  const letterSmoother = new PredictionSmoother({ windowSize: 10, stableCount: 7, cooldown: 10, confidenceThreshold: 0.70 });
   const wordSmoother = new PredictionSmoother({ windowSize: 8, stableCount: 3, cooldown: 10, confidenceThreshold: 0.3 });
   let wordBuffer = [];
 

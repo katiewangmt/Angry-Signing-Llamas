@@ -94,7 +94,6 @@ export async function createEngine({ video, onMessage }) {
 
   return {
     start() { if (running) return; running = true; lastProcessMs = 0; frameCount = 0; rafId = requestAnimationFrame(processFrame); },
-    stop() { running = false; if (rafId) cancelAnimationFrame(rafId); rafId = null; },
     setMode,
     dispose() {
       running = false;

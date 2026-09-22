@@ -1,0 +1,17 @@
+# Collapse vendored/generated assets in PR diffs & GitHub language stats so
+# reviewers focus on authored code (app.js, styles.css, index.html,
+# detection/*.js, audio/*.js, build/*).
+
+# Vendored third-party runtime (TensorFlow.js + MediaPipe tasks-vision)
+frontend/detection/vendor/**            linguist-vendored=true -diff
+
+# Generated model artifacts (converted from the Keras models)
+frontend/detection/models/**            linguist-generated=true -diff
+frontend/detection/hand_landmarker.task linguist-vendored=true  -diff
+
+# Vendored Google Fonts (served locally for the static build)
+frontend/fonts/*.woff2                  linguist-vendored=true  -diff
+frontend/fonts/fonts.css                linguist-vendored=true
+
+# Bundled CC0 audio asset
+frontend/audio/music/loop.mp3           -diff

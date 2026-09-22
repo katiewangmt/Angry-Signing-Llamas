@@ -142,6 +142,7 @@
         corners.forEach(c => c.style.display = 'none');
         cameraOn = false;
         setChallengeStartEnabled(false);
+        clearDetectionReadout();
       }
     }
 
@@ -202,6 +203,7 @@
         aslEngine.dispose();
         aslEngine = null;
       }
+      clearDetectionReadout();
     }
 
     const HAND_CONNECTIONS = [
@@ -276,11 +278,70 @@
       }
 
       if (msg.type === 'detection') {
+        // Live readout of the most recently detected sign
+        let readoutText = '';
+        if (msg.kind === 'letter') readoutText = msg.value;
+        else if (msg.kind === 'word') readoutText = (msg.word || msg.value || '').replace(/_/g, ' ');
+        if (readoutText) showDetectionReadout(readoutText);
+
         // Check tutorial match
         checkTutorialDetection(msg);
         // Check challenge match
         checkChallengeDetection(msg);
       }
+    }
+
+    // ============================================================
+    // LIVE DETECTION READOUT — small chip over the webcam showing
+    // the most recently detected sign, so learners can self-correct.
+    // ============================================================
+    let detectionReadoutTimer = null;
+
+    function showDetectionReadout(text) {
+      const el = document.getElementById('detectionReadout');
+      if (!el) return;
+      el.textContent = text;
+      el.classList.add('visible');
+      if (detectionReadoutTimer) clearTimeout(detectionReadoutTimer);
+      // Fade after a short idle period with no new detections
+      detectionReadoutTimer = setTimeout(() => {
+        el.classList.remove('visible');
+      }, 1500);
+    }
+
+    function clearDetectionReadout() {
+      if (detectionReadoutTimer) { clearTimeout(detectionReadoutTimer); detectionReadoutTimer = null; }
+      const el = document.getElementById('detectionReadout');
+      if (el) {
+        el.classList.remove('visible');
+        el.textContent = '';
+      }
+    }
+
+    // ============================================================
+    // SUCCESS CUE — brief, silent positive feedback on a correct
+    // sign (used by both the tutorial and challenge correct paths).
+    // ============================================================
+    let successCueTimer = null;
+
+    function showSuccessCue() {
+      const el = document.getElementById('successCue');
+      const container = document.getElementById('webcamContainer');
+      if (!el || !container) return;
+
+      // Restart the animation/transition even if triggered again quickly
+      el.classList.remove('pop');
+      container.classList.remove('success-flash');
+      void el.offsetWidth; // force reflow
+
+      el.classList.add('pop');
+      container.classList.add('success-flash');
+
+      if (successCueTimer) clearTimeout(successCueTimer);
+      successCueTimer = setTimeout(() => {
+        el.classList.remove('pop');
+        container.classList.remove('success-flash');
+      }, 600);
     }
 
     // ============================================================
@@ -441,6 +502,7 @@
             status.className = 'tutorial-status correct';
             status.textContent = 'Correct!';
           }
+          showSuccessCue();
           // Auto-advance after 1.5s
           tutorialAdvanceTimer = setTimeout(() => advanceTutorial(), 1500);
         }
@@ -571,10 +633,54 @@
         challengeAnimFrame = null;
       }
       challengeLastTime = 0;
+      clearChallengeCountdown();
 
       const bar = document.getElementById('challengeScrollBar');
       bar.classList.remove('visible');
       bar.innerHTML = '';
+    }
+
+    // ============================================================
+    // CHALLENGE COUNTDOWN — 3, 2, 1, GO before the scroll loop starts
+    // ============================================================
+    let challengeCountdownTimers = [];
+
+    function clearChallengeCountdown() {
+      challengeCountdownTimers.forEach(t => clearTimeout(t));
+      challengeCountdownTimers = [];
+      const el = document.getElementById('challengeCountdown');
+      if (el) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+      }
+    }
+
+    // Shows a 3 -> 2 -> 1 -> GO! overlay, then calls onComplete — but only
+    // if the challenge is still active (guards against quitting mid-countdown
+    // or starting a new challenge while one is already counting down).
+    function runChallengeCountdown(onComplete) {
+      clearChallengeCountdown();
+      const el = document.getElementById('challengeCountdown');
+      if (!el) { onComplete(); return; }
+
+      const steps = ['3', '2', '1', 'GO!'];
+      el.style.display = 'flex';
+      let i = 0;
+
+      const tick = () => {
+        if (!challengeActive) { clearChallengeCountdown(); return; }
+        el.innerHTML = '<div class="challenge-countdown-number">' + steps[i] + '</div>';
+        i++;
+        if (i < steps.length) {
+          challengeCountdownTimers.push(setTimeout(tick, 700));
+        } else {
+          challengeCountdownTimers.push(setTimeout(() => {
+            clearChallengeCountdown();
+            if (challengeActive) onComplete();
+          }, 700));
+        }
+      };
+      tick();
     }
 
     function startChallenge() {
@@ -629,7 +735,14 @@
         nextX += w + BASE_SPACING;
       }
 
-      challengeAnimFrame = requestAnimationFrame(challengeLoop);
+      // Countdown (3-2-1-GO) before the items start scrolling. The loop is
+      // only kicked off once the countdown finishes AND the challenge is
+      // still active (guards against quitting mid-countdown).
+      runChallengeCountdown(() => {
+        if (!challengeActive) return;
+        challengeLastTime = 0;
+        challengeAnimFrame = requestAnimationFrame(challengeLoop);
+      });
     }
 
     function spawnChallengeItem(x, label) {
@@ -770,6 +883,7 @@
       // so next detection instantly targets the next item
       item.state = 'correct';
       challengeCorrect++;
+      showSuccessCue();
 
       // For unlimited mode, add points
       if (challengeDifficulty === 'unlimited') {

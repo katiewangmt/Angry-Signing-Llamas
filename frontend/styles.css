@@ -887,6 +887,87 @@
       text-shadow: 0 0 20px var(--accent-glow);
     }
 
+    /* === LIVE DETECTION READOUT === */
+    .detection-readout {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 12;
+      padding: 6px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--accent);
+      box-shadow: 0 4px 16px var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .detection-readout.visible {
+      opacity: 0.95;
+    }
+
+    /* === SUCCESS CUE === */
+    .success-cue {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 15;
+      transform: translate(-50%, -50%) scale(0.6);
+      font-family: var(--font-pixel);
+      font-size: 40px;
+      color: var(--accent);
+      text-shadow: 0 0 20px var(--accent-glow);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .success-cue.pop {
+      animation: successPop 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes successPop {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+      30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+      60% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    .webcam-container.success-flash {
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05) inset, 0 0 40px var(--accent-glow);
+    }
+
+    /* === CHALLENGE COUNTDOWN === */
+    .challenge-countdown {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .challenge-countdown-number {
+      font-family: var(--font-pixel);
+      font-size: 56px;
+      color: var(--accent);
+      text-shadow: 0 0 30px var(--accent-glow), 0 0 60px var(--accent-glow);
+      animation: countdownPop 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes countdownPop {
+      0% { opacity: 0; transform: scale(0.6); }
+      30% { opacity: 1; transform: scale(1.15); }
+      70% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1); }
+    }
+
     /* === STATS TAB === */
     .stats-container {
       display: flex;

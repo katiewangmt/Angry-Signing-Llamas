@@ -219,6 +219,27 @@
       text-align: center;
     }
 
+    .webcam-error {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 260px;
+      padding: 20px;
+      background: var(--bg-card);
+      border: 2px solid var(--danger);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px var(--shadow);
+    }
+
+    .webcam-error p {
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      line-height: 1.6;
+      text-align: center;
+      color: var(--danger);
+    }
+
     .webcam-overlay {
       position: absolute;
       top: 10px;
@@ -295,6 +316,20 @@
 
     .cam-btn.active:hover {
       box-shadow: 0 6px 20px rgba(255,68,102,0.35), 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .cam-btn:disabled,
+    .skip-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .cam-btn:disabled:hover,
+    .skip-btn:disabled:hover {
+      transform: none;
+      box-shadow: none;
     }
 
     /* RIGHT: CONTROLS */

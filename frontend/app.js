@@ -54,6 +54,51 @@
     // ============================================================
     // CAMERA
     // ============================================================
+
+    // Enable/disable the Challenge "Start" button based on camera state
+    function setChallengeStartEnabled(enabled) {
+      const btn = document.getElementById('challengeStartBtn');
+      const hint = document.getElementById('challengeStartHint');
+      if (btn) {
+        btn.disabled = !enabled;
+        btn.title = enabled ? '' : 'Turn on the camera to play';
+      }
+      if (hint) hint.style.display = enabled ? 'none' : 'block';
+    }
+    setChallengeStartEnabled(false);
+
+    // Inline camera-permission/error panel shown in the webcam area
+    function showCameraError(err) {
+      const placeholder = document.getElementById('webcamPlaceholder');
+      const errorPanel = document.getElementById('webcamError');
+      const errorMsg = document.getElementById('webcamErrorMsg');
+      if (!errorPanel || !errorMsg) return;
+
+      const name = err && err.name;
+      let message;
+      if (name === 'NotAllowedError' || name === 'SecurityError') {
+        message = 'Camera access was blocked. Allow the camera in your browser, then press Retry.';
+      } else if (name === 'NotFoundError' || name === 'OverconstrainedError') {
+        message = 'No camera was found. Connect a camera and press Retry.';
+      } else {
+        message = "Couldn't start the camera — it may be in use by another app. Press Retry.";
+      }
+
+      errorMsg.textContent = message;
+      if (placeholder) placeholder.style.display = 'none';
+      errorPanel.style.display = 'flex';
+    }
+
+    function hideCameraError() {
+      const errorPanel = document.getElementById('webcamError');
+      if (errorPanel) errorPanel.style.display = 'none';
+    }
+
+    function retryCamera() {
+      hideCameraError();
+      toggleCamera();
+    }
+
     async function toggleCamera() {
       const video = document.getElementById('webcamVideo');
       const placeholder = document.getElementById('webcamPlaceholder');
@@ -70,15 +115,19 @@
           video.srcObject = stream;
           video.style.display = 'block';
           placeholder.style.display = 'none';
+          hideCameraError();
           stopBtn.style.display = 'block';
           overlay.style.display = 'flex';
           corners.forEach(c => c.style.display = 'block');
           cameraOn = true;
+          setChallengeStartEnabled(true);
           startFpsCounter();
           startASLDetection();
         } catch (err) {
-          alert('Could not access camera. Please allow camera permissions.');
           console.error(err);
+          cameraOn = false;
+          setChallengeStartEnabled(false);
+          showCameraError(err);
         }
       } else {
         if (challengeActive) quitChallenge();
@@ -87,10 +136,12 @@
         video.srcObject = null;
         video.style.display = 'none';
         placeholder.style.display = 'flex';
+        hideCameraError();
         stopBtn.style.display = 'none';
         overlay.style.display = 'none';
         corners.forEach(c => c.style.display = 'none');
         cameraOn = false;
+        setChallengeStartEnabled(false);
       }
     }
 
@@ -353,6 +404,7 @@
           <div class="tutorial-desc">${sign.desc}</div>
           <div class="tutorial-status waiting" id="tutorialStatus"></div>
           <div class="tutorial-actions">
+            <button class="skip-btn" id="tutorialBackBtn" onclick="tutorialBack()"${tutorialIndex === 0 ? ' disabled' : ''}>Back</button>
             <button class="skip-btn" onclick="resetTutorial()">Reset</button>
             <button class="skip-btn" onclick="skipTutorialSign()">Skip</button>
           </div>
@@ -404,6 +456,12 @@
     function skipTutorialSign() {
       if (tutorialAdvanceTimer) { clearTimeout(tutorialAdvanceTimer); tutorialAdvanceTimer = null; }
       tutorialIndex++;
+      renderTutorial();
+    }
+
+    function tutorialBack() {
+      if (tutorialAdvanceTimer) { clearTimeout(tutorialAdvanceTimer); tutorialAdvanceTimer = null; }
+      if (tutorialIndex > 0) tutorialIndex--;
       renderTutorial();
     }
 
@@ -520,10 +578,7 @@
     }
 
     function startChallenge() {
-      if (!cameraOn) {
-        alert('Please start the camera first!');
-        return;
-      }
+      if (!cameraOn) return;
 
       challengeActive = true;
       challengeCorrect = 0;

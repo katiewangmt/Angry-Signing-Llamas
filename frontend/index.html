@@ -33,6 +33,10 @@
             <p>Press start camera<br>to begin signing</p>
             <button class="cam-btn" id="camBtn" onclick="toggleCamera()">Start Camera</button>
           </div>
+          <div class="webcam-error" id="webcamError" style="display:none;">
+            <p id="webcamErrorMsg"></p>
+            <button class="cam-btn" id="webcamErrorRetryBtn" onclick="retryCamera()">Retry</button>
+          </div>
           <video id="webcamVideo" autoplay playsinline style="display:none;"></video>
           <canvas id="handCanvas" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
           <div class="webcam-overlay" id="webcamOverlay" style="display:none;">
@@ -111,7 +115,8 @@
               </div>
               <!-- Action buttons -->
               <div class="challenge-section" style="border-top:none;padding-top:4px;">
-                <button class="cam-btn" id="challengeStartBtn" onclick="startChallenge()">Start Challenge</button>
+                <button class="cam-btn" id="challengeStartBtn" onclick="startChallenge()" disabled title="Turn on the camera to play">Start Challenge</button>
+                <div class="challenge-info" id="challengeStartHint" style="font-size:11px;margin-top:6px;">Turn on the camera to play</div>
                 <button class="cam-btn active" id="challengeQuitBtn" onclick="quitChallenge()" style="display:none;">Quit Challenge</button>
               </div>
             </div>

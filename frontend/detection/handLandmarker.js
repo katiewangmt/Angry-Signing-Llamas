@@ -24,5 +24,8 @@ export async function createHandLandmarker() {
       if (res.landmarks && res.landmarks.length > 0) return res.landmarks[0];
       return null;
     },
+    close() {
+      landmarker.close();
+    },
   };
 }

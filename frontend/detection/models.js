@@ -25,5 +25,9 @@ export async function loadModels() {
         return argmaxConf(d);
       });
     },
+    dispose() {
+      staticModel.dispose();
+      lstmModel.dispose();
+    },
   };
 }

@@ -1,3 +1,7 @@
+    :root {
+      --font-pixel: 'Press Start 2P', cursive;
+    }
+
     [data-theme="dark"] {
       --bg-primary: #1a1a2e;
       --bg-secondary: #16213e;
@@ -36,7 +40,7 @@
     html, body { transition: background 0.4s ease, color 0.4s ease; }
 
     body {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       background: var(--bg-primary);
       color: var(--text-primary);
       min-height: 100vh;
@@ -86,7 +90,7 @@
     }
 
     .logo {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 14px;
       color: var(--text-primary);
       transition: color 0.6s;
@@ -167,7 +171,7 @@
     }
 
     .section-label {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 2px;
@@ -209,7 +213,7 @@
     .webcam-placeholder svg { opacity: 0.3; }
 
     .webcam-placeholder p {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 10px;
       line-height: 1.6;
       text-align: center;
@@ -230,7 +234,7 @@
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(74,222,128,0.3);
       border-radius: 6px;
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 8px;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -265,7 +269,7 @@
       color: var(--bg-primary);
       border: none;
       border-radius: 8px;
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 10px;
       cursor: pointer;
       text-transform: uppercase;
@@ -328,7 +332,7 @@
       border: none;
       border-radius: 7px;
       color: var(--text-secondary);
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 10px;
       cursor: pointer;
       text-transform: uppercase;
@@ -378,7 +382,7 @@
     }
 
     .progress-text {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 12px;
       color: var(--text-primary);
       white-space: nowrap;
@@ -404,7 +408,7 @@
     }
 
     .tutorial-sign-name {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 32px;
       color: var(--accent);
       text-align: center;
@@ -434,14 +438,14 @@
     }
 
     .tutorial-image .placeholder-letter {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 64px;
       color: var(--border);
       opacity: 0.5;
     }
 
     .tutorial-desc {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 12px;
       font-weight: normal;
       color: var(--text-primary);
@@ -450,7 +454,7 @@
     }
 
     .tutorial-status {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 12px;
       padding: 10px 24px;
       border-radius: 8px;
@@ -477,7 +481,7 @@
     .tutorial-actions button {
       flex: 1;
       padding: 14px 16px;
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 11px;
       border-radius: 8px;
       cursor: pointer;
@@ -519,13 +523,13 @@
     }
 
     .tutorial-complete .complete-title {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 14px;
       color: var(--accent);
     }
 
     .tutorial-complete .complete-sub {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 13px;
       color: var(--text-secondary);
     }
@@ -550,7 +554,7 @@
       border: none;
       border-radius: 7px;
       color: var(--text-secondary);
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 9px;
       cursor: pointer;
       text-transform: uppercase;
@@ -576,7 +580,7 @@
     /* === FOOTER === */
     .footer {
       text-align: left;
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 8px;
       color: var(--text-secondary);
       opacity: 0.6;
@@ -669,7 +673,7 @@
       border: none;
       border-radius: 7px;
       color: var(--text-secondary);
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 10px;
       cursor: pointer;
       text-transform: uppercase;
@@ -714,7 +718,7 @@
     }
 
     .score-label {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 8px;
       color: var(--text-secondary);
       text-transform: uppercase;
@@ -723,7 +727,7 @@
     }
 
     .score-value {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 28px;
     }
 
@@ -731,7 +735,7 @@
     .score-value.wrong-val { color: var(--danger); }
 
     .challenge-info {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 13px;
       color: var(--text-secondary);
       text-align: center;
@@ -748,13 +752,13 @@
     }
 
     .challenge-result-title {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 16px;
       animation: scorePopUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
     }
 
     .challenge-result-sub {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 13px;
       color: var(--text-secondary);
       text-align: center;
@@ -801,7 +805,7 @@
 
     .scroll-letter {
       position: absolute;
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 22px;
       top: 50%;
       transform: translateY(-50%);
@@ -863,7 +867,7 @@
     }
 
     .stats-section-title {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 11px;
       color: var(--text-primary);
       text-transform: uppercase;
@@ -911,7 +915,7 @@
     }
 
     .stat-label {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 12px;
       color: var(--text-primary);
       margin-bottom: 4px;
@@ -937,7 +941,7 @@
     }
 
     .stat-value {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 14px;
       color: var(--danger);
       font-weight: 500;
@@ -980,7 +984,7 @@
     }
 
     .leaderboard-rank {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 10px;
       color: var(--accent);
       width: 30px;
@@ -988,7 +992,7 @@
     }
 
     .leaderboard-score {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 14px;
       color: var(--text-primary);
       flex: 1;
@@ -996,7 +1000,7 @@
     }
 
     .leaderboard-date {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 10px;
       color: var(--text-secondary);
       flex-shrink: 0;
@@ -1005,7 +1009,7 @@
     }
 
     .no-stats {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 13px;
       color: var(--text-secondary);
       text-align: center;
@@ -1014,7 +1018,7 @@
     }
 
     .no-leaderboard {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font-pixel);
       font-size: 13px;
       color: var(--text-secondary);
       text-align: center;

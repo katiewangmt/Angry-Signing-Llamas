@@ -497,6 +497,28 @@
       return display.length * 14 + 20;
     }
 
+    // Enable/disable the difficulty buttons + speed slider together
+    function setControlsEnabled(enabled) {
+      document.getElementById('diffEasy').disabled = !enabled;
+      document.getElementById('diffHard').disabled = !enabled;
+      document.getElementById('diffUnlimited').disabled = !enabled;
+      document.getElementById('challengeSpeedSlider').disabled = !enabled;
+    }
+
+    // Shared teardown steps common to ending/quitting a challenge run
+    function teardownChallenge() {
+      challengeActive = false;
+      if (challengeAnimFrame) {
+        cancelAnimationFrame(challengeAnimFrame);
+        challengeAnimFrame = null;
+      }
+      challengeLastTime = 0;
+
+      const bar = document.getElementById('challengeScrollBar');
+      bar.classList.remove('visible');
+      bar.innerHTML = '';
+    }
+
     function startChallenge() {
       if (!cameraOn) {
         alert('Please start the camera first!');
@@ -526,11 +548,8 @@
       document.getElementById('challengeStartBtn').style.display = 'none';
       document.getElementById('challengeQuitBtn').style.display = 'inline-block';
       document.getElementById('challengeScoreSection').style.display = 'flex';
-      document.getElementById('diffEasy').disabled = true;
-      document.getElementById('diffHard').disabled = true;
-      document.getElementById('diffUnlimited').disabled = true;
-      document.getElementById('challengeSpeedSlider').disabled = true;
-      
+      setControlsEnabled(false);
+
       // Update score label and goal text for unlimited mode
       if (challengeDifficulty === 'unlimited') {
         document.getElementById('scoreLabelCorrect').textContent = 'Score';
@@ -751,16 +770,7 @@
     }
 
     function endChallenge(won) {
-      challengeActive = false;
-      if (challengeAnimFrame) {
-        cancelAnimationFrame(challengeAnimFrame);
-        challengeAnimFrame = null;
-      }
-      challengeLastTime = 0;
-
-      const bar = document.getElementById('challengeScrollBar');
-      bar.classList.remove('visible');
-      bar.innerHTML = '';
+      teardownChallenge();
 
       document.getElementById('challengeSetup').style.display = 'none';
       document.getElementById('challengeQuitBtn').style.display = 'none';
@@ -794,16 +804,7 @@
     }
 
     function endUnlimitedChallenge() {
-      challengeActive = false;
-      if (challengeAnimFrame) {
-        cancelAnimationFrame(challengeAnimFrame);
-        challengeAnimFrame = null;
-      }
-      challengeLastTime = 0;
-
-      const bar = document.getElementById('challengeScrollBar');
-      bar.classList.remove('visible');
-      bar.innerHTML = '';
+      teardownChallenge();
 
       document.getElementById('challengeSetup').style.display = 'none';
       document.getElementById('challengeQuitBtn').style.display = 'none';
@@ -834,26 +835,14 @@
     }
 
     function quitChallenge() {
-      challengeActive = false;
-      if (challengeAnimFrame) {
-        cancelAnimationFrame(challengeAnimFrame);
-        challengeAnimFrame = null;
-      }
-      challengeLastTime = 0;
-
-      const bar = document.getElementById('challengeScrollBar');
-      bar.classList.remove('visible');
-      bar.innerHTML = '';
+      teardownChallenge();
 
       // Reset UI
       document.getElementById('challengeSetup').classList.remove('compact');
       document.getElementById('challengeStartBtn').style.display = 'inline-block';
       document.getElementById('challengeQuitBtn').style.display = 'none';
       document.getElementById('challengeScoreSection').style.display = 'none';
-      document.getElementById('diffEasy').disabled = false;
-      document.getElementById('diffHard').disabled = false;
-      document.getElementById('diffUnlimited').disabled = false;
-      document.getElementById('challengeSpeedSlider').disabled = false;
+      setControlsEnabled(true);
     }
 
     function stopChallenge() {
@@ -872,11 +861,8 @@
       document.getElementById('challengeStartBtn').style.display = 'inline-block';
       document.getElementById('challengeQuitBtn').style.display = 'none';
       document.getElementById('challengeScoreSection').style.display = 'none';
-      document.getElementById('diffEasy').disabled = false;
-      document.getElementById('diffHard').disabled = false;
-      document.getElementById('diffUnlimited').disabled = false;
-      document.getElementById('challengeSpeedSlider').disabled = false;
-      
+      setControlsEnabled(true);
+
       // Reset score label
       document.getElementById('scoreLabelCorrect').textContent = 'Correct';
 

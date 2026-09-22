@@ -588,6 +588,7 @@
       el.textContent = label.replace(/_/g, ' ');
       el.style.left = x + 'px';
       document.getElementById('challengeScrollBar').appendChild(el);
+      item.el = el;
     }
 
     function challengeLoop(timestamp) {
@@ -599,7 +600,6 @@
 
       const bar = document.getElementById('challengeScrollBar');
       const barWidth = bar.offsetWidth || 600;
-      const els = bar.querySelectorAll('.scroll-letter');
       const leftIdx = getLeftmostActiveIndex();
 
       const baseSpeed = challengeDifficulty === 'hard' ? BASE_SPEED_HARD : BASE_SPEED_EASY;
@@ -612,9 +612,9 @@
       });
 
       // Update DOM positions
-      els.forEach((el, i) => {
-        const item = challengeItems[i];
-        if (!item) return;
+      challengeItems.forEach((item) => {
+        const el = item.el;
+        if (!el) return;
 
         // Remove finished items from DOM
         if (item.state === 'done') {
@@ -626,7 +626,7 @@
         el.className = 'scroll-letter';
         if (item.state === 'correct') el.classList.add('correct');
         else if (item.state === 'wrong') el.classList.add('wrong');
-        else if (i === leftIdx) el.classList.add('active');
+        else if (item === challengeItems[leftIdx]) el.classList.add('active');
       });
 
       // Check if leftmost has fully left the screen
@@ -650,6 +650,14 @@
       const nextStart = rightmostX + rightmostWidth + BASE_SPACING;
       if (nextStart < barWidth + 100) {
         spawnChallengeItem(nextStart);
+      }
+
+      // Prune finished items from the array and DOM to prevent unbounded growth
+      for (let i = challengeItems.length - 1; i >= 0; i--) {
+        if (challengeItems[i].state === 'done') {
+          if (challengeItems[i].el) challengeItems[i].el.remove();
+          challengeItems.splice(i, 1);
+        }
       }
 
       challengeAnimFrame = requestAnimationFrame(challengeLoop);
@@ -701,19 +709,21 @@
     }
 
     function markChallengeCorrect(idx) {
+      const item = challengeItems[idx];
+      if (!item) return;
       // Mark as 'correct' immediately — getLeftmostActiveIndex skips non-active,
       // so next detection instantly targets the next item
-      challengeItems[idx].state = 'correct';
+      item.state = 'correct';
       challengeCorrect++;
-      
+
       // For unlimited mode, add points
       if (challengeDifficulty === 'unlimited') {
         challengeScore += POINTS_PER_CORRECT;
       }
-      
+
       updateChallengeScore();
       setTimeout(() => {
-        if (challengeItems[idx]) challengeItems[idx].state = 'done';
+        item.state = 'done';
       }, 350);
       
       // Only check win condition for non-unlimited modes
@@ -725,6 +735,7 @@
 
     function markChallengeWrong(idx) {
       const item = challengeItems[idx];
+      if (!item) return;
       item.state = 'wrong';
       challengeWrong++;
       
@@ -738,7 +749,7 @@
       
       updateChallengeScore();
       setTimeout(() => {
-        if (challengeItems[idx]) challengeItems[idx].state = 'done';
+        item.state = 'done';
       }, 500);
       
       // Check lose condition - all modes end at 10 wrong

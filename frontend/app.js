@@ -557,12 +557,14 @@
 
     // Session stats tracking
     let sessionStats = {}; // {letter/word: wrongCount}
-    // Base speeds per difficulty — slider multiplies these
-    const BASE_SPEED_EASY = 45;
-    const BASE_SPEED_HARD = 65;
-    const SPEED_MULTIPLIERS = [0.5, 0.75, 1.0, 1.3, 1.6]; // slider 1-5
+    // Pacing knobs — first-pass values, tune to taste. Lower base speeds and
+    // wider spacing give the player more time to see -> do -> register a sign
+    // before it scrolls off. Slider multiplies the base speed.
+    const BASE_SPEED_EASY = 30;
+    const BASE_SPEED_HARD = 45;
+    const SPEED_MULTIPLIERS = [0.6, 0.8, 1.0, 1.3, 1.6]; // slider 1-5
     const SPEED_LABELS = ['Very Slow', 'Slow', 'Normal', 'Fast', 'Very Fast'];
-    const BASE_SPACING = 100;
+    const BASE_SPACING = 130;
     let challengeLastLabel = null;
     let challengeSpeedMult = 1.0;
 
@@ -612,7 +614,11 @@
     // Measure text width for dynamic spacing
     function measureLabelWidth(label) {
       const display = label.replace(/_/g, ' ');
-      // ~14px per char in Press Start 2P at 22px font-size
+      if (display.length > 1) {
+        // Word tiles render smaller (.scroll-letter.word, 15px) — ~9px/char
+        return display.length * 9 + 20;
+      }
+      // Single letters render at the base 22px font-size — ~14px/char
       return display.length * 14 + 20;
     }
 
@@ -747,12 +753,14 @@
     function spawnChallengeItem(x, label) {
       if (!label) label = getRandomChallengeItem();
       const w = measureLabelWidth(label);
-      const item = { label, x, width: w, state: 'active' };
+      const display = label.replace(/_/g, ' ');
+      const isWord = display.length > 1;
+      const item = { label, x, width: w, state: 'active', isWord };
       challengeItems.push(item);
 
       const el = document.createElement('div');
-      el.className = 'scroll-letter';
-      el.textContent = label.replace(/_/g, ' ');
+      el.className = 'scroll-letter' + (isWord ? ' word' : '');
+      el.textContent = display;
       el.style.left = x + 'px';
       document.getElementById('challengeScrollBar').appendChild(el);
       item.el = el;
@@ -790,7 +798,7 @@
         }
 
         el.style.left = item.x + 'px';
-        el.className = 'scroll-letter';
+        el.className = 'scroll-letter' + (item.isWord ? ' word' : '');
         if (item.state === 'correct') el.classList.add('correct');
         else if (item.state === 'wrong') el.classList.add('wrong');
         else if (item === challengeItems[leftIdx]) el.classList.add('active');
@@ -846,31 +854,35 @@
       if (!challengeActive) return;
       if (msg.type !== 'detection') return;
 
-      const leftIdx = getLeftmostActiveIndex();
-      if (leftIdx < 0) return;
-
-      const item = challengeItems[leftIdx];
       let detected = '';
-
       if (msg.kind === 'letter') detected = msg.value;
       else if (msg.kind === 'word') detected = msg.word || msg.value;
       if (!detected) return;
 
-      const isLetter = item.label.length === 1;
+      // Credit the LEFTMOST ACTIVE item whose label matches the detection —
+      // search all active items (not just the front one) so an unknown sign
+      // sitting at the front doesn't block scoring the others behind it.
+      // Letter detections only match single-char labels, word detections only
+      // match multi-char labels.
+      let matchIdx = -1;
+      let matchX = Infinity;
+      challengeItems.forEach((item, i) => {
+        if (item.state !== 'active') return;
+        if (item.label !== detected) return;
+        const isLetter = item.label.length === 1;
+        if (msg.kind === 'letter' && !isLetter) return;
+        if (msg.kind === 'word' && isLetter) return;
+        if (item.x < matchX) {
+          matchX = item.x;
+          matchIdx = i;
+        }
+      });
 
-      if (isLetter) {
-        if (msg.kind === 'letter' && detected === item.label) {
-          markChallengeCorrect(leftIdx);
-        }
-        // Non-matching letter detections are ignored (no penalty) — only a sign
-        // scrolling fully off-screen counts as wrong (see challengeLoop).
-      } else {
-        if (msg.kind === 'word' && detected === item.label) {
-          markChallengeCorrect(leftIdx);
-        }
-        // Non-matching word detections are ignored (no penalty) — only a sign
-        // scrolling fully off-screen counts as wrong (see challengeLoop).
+      if (matchIdx >= 0) {
+        markChallengeCorrect(matchIdx);
       }
+      // No match found — ignored (no penalty). Only a sign scrolling fully
+      // off-screen counts as wrong (see challengeLoop).
     }
 
     function markChallengeCorrect(idx) {

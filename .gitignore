@@ -16,3 +16,4 @@ node_modules/
 build/fixtures/
 dist/
 angry-signing-llamas-ghg.zip
+.superpowers/

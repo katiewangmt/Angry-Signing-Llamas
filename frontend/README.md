@@ -1,27 +1,22 @@
-# ASL Freestyle frontend
+# Angry Signing Llamas
 
-- **Camera + hand landmarks:** “Start camera” uses your webcam and draws 21 hand landmarks (MediaPipe in the browser). “Stop camera” turns it off.
-- **Random music:** “Play random music” and “Pause” call the Java backend.
+A fully static, in-browser ASL practice game. No backend and no external API calls.
 
-## Easiest: use the backend’s page (no port 3000)
+- **Hand detection:** MediaPipe HandLandmarker (WASM + model bundled in `detection/`).
+- **Sign recognition:** TF.js models bundled in `detection/models/`.
+- **Audio:** pre-generated voice clips and music in `audio/`.
 
-1. Start the backend:
-   ```bash
-   cd backend-java
-   mvn spring-boot:run
-   ```
-2. Open in your browser: **http://localhost:5000**
+## Run locally
 
-The same app (camera + music) is served there. You don’t need to run anything on port 3000.
+Serve the `frontend/` folder with any static file server, for example:
 
-## Optional: run this folder separately
+    python3 -m http.server 3000 --directory frontend
 
-If you want to serve this `frontend/` folder on another port (e.g. 3000):
+Open http://localhost:3000 and allow camera access (the camera needs localhost or HTTPS).
 
-```bash
-npx serve frontend -p 3000
-```
+## Build the submission zip
 
-Then open **http://localhost:3000**. The page will call the backend at `http://localhost:5000` (CORS is allowed). If port 3000 doesn’t open, use **http://localhost:5000** instead (see above).
+    npm ci
+    npm run dist
 
-**Camera:** Allow camera access when the browser prompts. Hand landmarks load from MediaPipe’s CDN.
+This creates `angry-signing-llamas-ghg.zip` with `index.html` at the root.

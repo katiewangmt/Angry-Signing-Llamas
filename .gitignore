@@ -1,12 +1,14 @@
-# Build and cache
-backend-java/target/
-backend-java/.mvn/cache/
+# OS / Python cache
+.DS_Store
+__pycache__/
 *.class
 
-# Generated audio (keep folder via .gitkeep)
-backend-java/generated/*.wav
+# Secrets
+.env
 
-# OS
-.DS_Store
-backend/target/
-__pycache__/
+# Node build tooling (vendored runtime deps in frontend/detection/vendor are NOT ignored)
+node_modules/
+build/fixtures/
+dist/
+angry-signing-llamas-ghg.zip
+.superpowers/

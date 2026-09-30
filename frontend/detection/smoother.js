@@ -1,4 +1,4 @@
-// Port of PredictionSmoother from test-backend/asl_handler.py.
+// Port of PredictionSmoother from the original Python backend (asl_handler.py).
 // prediction is an integer class index or null; returns [accepted|null, conf].
 export class PredictionSmoother {
   constructor({ windowSize = 12, stableCount = 8, cooldown = 15, confidenceThreshold = 0.65 } = {}) {
